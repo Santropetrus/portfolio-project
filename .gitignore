@@ -1,0 +1,4 @@
+# Paket kiriman (zip project + bundle git) — dibuat ulang tiap tahap,
+# tidak perlu masuk riwayat repositori.
+*.zip
+*.bundle
