@@ -36,6 +36,7 @@ export default function Tombol({
     'font-body font-semibold uppercase tracking-papan',
     'transition-[background-color,transform,box-shadow] duration-100',
     'no-underline cursor-pointer',
+    'disabled:cursor-not-allowed disabled:opacity-60 disabled:active:translate-x-0 disabled:active:translate-y-0',
     gaya[variasi] ?? gaya.utama,
     ukuran[besar] ?? ukuran.md,
     className,

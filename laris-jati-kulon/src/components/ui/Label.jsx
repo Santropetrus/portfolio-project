@@ -3,14 +3,17 @@
  * - status "tersedia"/"habis" pakai warna semantik terpisah dari aksen indigo
  * - varian "tulis" meniru coretan papan harga warung (font Caveat)
  */
-export function LabelStatus({ status, className = '' }) {
-  const habis = status === 'habis'
+export function LabelStatus({ status, jenis = 'produk', className = '' }) {
+  const merah = status === 'habis' || status === 'nonaktif'
+  const teks =
+    jenis === 'umkm' ? (merah ? 'Nonaktif' : 'Aktif') : merah ? 'Habis' : 'Tersedia'
+
   return (
     <span
       className={[
         'inline-flex items-center gap-1.5 rounded-papan border px-2 py-0.5',
         'font-body text-[0.68rem] font-semibold uppercase tracking-papan',
-        habis
+        merah
           ? 'border-status-habis/60 bg-status-habis/10 text-status-habis'
           : 'border-status-ok/60 bg-status-ok/10 text-status-ok',
         className,
@@ -18,9 +21,9 @@ export function LabelStatus({ status, className = '' }) {
     >
       <span
         aria-hidden="true"
-        className={['h-1.5 w-1.5', habis ? 'bg-status-habis' : 'bg-status-ok'].join(' ')}
+        className={['h-1.5 w-1.5', merah ? 'bg-status-habis' : 'bg-status-ok'].join(' ')}
       />
-      {habis ? 'Habis' : 'Tersedia'}
+      {teks}
     </span>
   )
 }

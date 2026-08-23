@@ -33,12 +33,6 @@ function BelumAdaFoto({ nama, id }) {
       >
         {inisial(nama) || 'JK'}
       </span>
-      <span
-        className="absolute right-3 top-2 font-body text-[0.58rem] uppercase tracking-papan opacity-35"
-        style={{ color: nada.teks }}
-      >
-        foto menyusul
-      </span>
     </div>
   )
 }

@@ -36,6 +36,13 @@ create policy "admin kelola kategori" on kategori for all using (auth.role() = '
 drop policy if exists "admin kelola profil" on profil_bumdes;
 create policy "admin kelola profil" on profil_bumdes for all using (auth.role() = 'authenticated');
 
+-- PENTING — matikan pendaftaran mandiri di Supabase.
+-- Kebijakan di bawah memberi akses tulis penuh kepada siapa pun yang berstatus
+-- 'authenticated'. Itu aman selama akun hanya dibuat manual oleh pengelola.
+-- Buka Authentication > Sign In / Providers > Email, lalu matikan
+-- "Allow new users to sign up". Kalau dibiarkan menyala, orang asing bisa
+-- mendaftar sendiri dan otomatis punya izin mengubah data katalog.
+
 -- CATATAN untuk didiskusikan sebelum data asli masuk:
 -- Kebijakan "publik baca produk" bernilai true, artinya produk milik UMKM
 -- berstatus 'nonaktif' pun masih bisa dibaca lewat API. Halaman publik tidak
