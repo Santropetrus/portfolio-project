@@ -1,0 +1,12 @@
+# Netlify: proyek berada di subfolder repo, jadi base perlu disebut eksplisit.
+[build]
+  base = "laris-jati-kulon"
+  command = "npm run build"
+  publish = "dist"
+
+# React Router memakai routing sisi klien: semua path diarahkan ke index.html
+# supaya /katalog atau /umkm/slug tidak 404 saat dibuka langsung.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

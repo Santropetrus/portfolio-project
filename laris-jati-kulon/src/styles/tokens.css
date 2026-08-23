@@ -1,0 +1,220 @@
+/* =========================================================================
+   LARIS — token desain
+   Sumber tunggal warna, font, tekstur. Semua komponen mengacu ke sini.
+   Warna dasar diambil persis dari spesifikasi bagian 6; token turunan
+   (--wood-deep, --parchment-deep, dst) hanya main gelap/terang dari warna
+   dasar yang sama — tidak ada hue baru yang bersaing dengan aksen indigo.
+   ========================================================================= */
+
+:root {
+  /* --- warna dasar (dari spesifikasi) --- */
+  --wood-dark: #3e2a1e;
+  --wood-mid: #8b5e34;
+  --parchment: #ede2cf;
+  --indigo: #2e4057;
+  --indigo-soft: #4a5d75;
+  --ivory-text: #f7f2e7;
+  --status-ok: #4f7942;
+  --status-habis: #a34a28;
+
+  /* --- turunan (hanya main gelap/terang dari token dasar di atas) --- */
+  --wood-deep: #2a1c13;       /* footer & header paling gelap */
+  --wood-soft: #b18a5f;       /* garis tipis di atas latar gelap */
+  --parchment-deep: #e0d2b6;  /* pita seksi selang-seling */
+  --parchment-light: #f3ebdb; /* permukaan kartu */
+  --indigo-deep: #1f2c3c;     /* bingkai tombol, state ditekan */
+
+  /* --- kanal RGB dari warna yang sama --- */
+  /* Tailwind memakai bentuk ini supaya modifier transparansi (mis. /45)
+     bisa dipakai tanpa menambah warna baru ke dalam palet. */
+  --wood-dark-rgb: 62 42 30;
+  --wood-mid-rgb: 139 94 52;
+  --wood-deep-rgb: 42 28 19;
+  --wood-soft-rgb: 177 138 95;
+  --parchment-rgb: 237 226 207;
+  --parchment-deep-rgb: 224 210 182;
+  --parchment-light-rgb: 243 235 219;
+  --indigo-rgb: 46 64 87;
+  --indigo-soft-rgb: 74 93 117;
+  --indigo-deep-rgb: 31 44 60;
+  --ivory-rgb: 247 242 231;
+  --status-ok-rgb: 79 121 66;
+  --status-habis-rgb: 163 74 40;
+
+  /* --- garis & bayangan --- */
+  --garis: rgba(62, 42, 30, 0.22);
+  --garis-tebal: rgba(62, 42, 30, 0.45);
+
+  /* --- font --- */
+  --font-display: Ultra, Georgia, serif;
+  --font-body: "Work Sans", system-ui, sans-serif;
+  --font-tulis: Caveat, cursive;
+}
+
+/* =========================================================================
+   Dasar
+   ========================================================================= */
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background-color: var(--parchment);
+  color: var(--wood-dark);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.65;
+  /* serat kertas: noise halus + gurat kayu vertikal samar */
+  background-image:
+    repeating-linear-gradient(
+      92deg,
+      rgba(62, 42, 30, 0.028) 0 1px,
+      transparent 1px 9px,
+      rgba(62, 42, 30, 0.016) 9px 10px,
+      transparent 10px 23px
+    );
+  background-attachment: fixed;
+}
+
+::selection {
+  background: var(--indigo);
+  color: var(--ivory-text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--indigo);
+  outline-offset: 2px;
+}
+
+img { display: block; max-width: 100%; }
+
+/* Ultra hanya punya satu berat; dikencangkan tracking-nya biar terkesan
+   dipahat, bukan sekadar font tebal. */
+.font-display,
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 1.06;
+}
+
+/* =========================================================================
+   Tekstur
+   ========================================================================= */
+
+/* Motif kawung (batik) — dipakai tipis sebagai pita/aksen, bukan latar penuh */
+.tex-batik {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill='none' stroke='%232E4057' stroke-width='1.1'%3E%3Cellipse cx='10' cy='20' rx='6.5' ry='9'/%3E%3Cellipse cx='30' cy='20' rx='6.5' ry='9'/%3E%3Cellipse cx='20' cy='10' rx='9' ry='6.5'/%3E%3Cellipse cx='20' cy='30' rx='9' ry='6.5'/%3E%3C/g%3E%3Ccircle cx='20' cy='20' r='1.5' fill='%232E4057'/%3E%3C/svg%3E");
+  background-size: 40px 40px;
+}
+
+/* Varian motif kawung berwarna kayu — dipakai pada placeholder foto */
+.tex-batik-kayu {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill='none' stroke='%238B5E34' stroke-width='1.1'%3E%3Cellipse cx='10' cy='20' rx='6.5' ry='9'/%3E%3Cellipse cx='30' cy='20' rx='6.5' ry='9'/%3E%3Cellipse cx='20' cy='10' rx='9' ry='6.5'/%3E%3Cellipse cx='20' cy='30' rx='9' ry='6.5'/%3E%3C/g%3E%3Ccircle cx='20' cy='20' r='1.5' fill='%238B5E34'/%3E%3C/svg%3E");
+  background-size: 40px 40px;
+}
+
+/* Papan kayu gelap: gurat memanjang di atas latar --wood-dark */
+.tex-papan {
+  background-color: var(--wood-dark);
+  background-image:
+    repeating-linear-gradient(
+      88deg,
+      rgba(247, 242, 231, 0.045) 0 1px,
+      transparent 1px 6px,
+      rgba(0, 0, 0, 0.22) 6px 7px,
+      transparent 7px 17px
+    );
+}
+
+/* Permukaan kertas kartu */
+.tex-kertas {
+  background-color: var(--parchment-light);
+  background-image:
+    repeating-linear-gradient(
+      91deg,
+      rgba(62, 42, 30, 0.022) 0 1px,
+      transparent 1px 11px
+    );
+}
+
+/* =========================================================================
+   Komponen kecil yang dipakai lintas halaman
+   ========================================================================= */
+
+/* Tautan teks: garis bawah tipis yang menebal saat hover (bukan warna baru) */
+.tautan {
+  color: var(--indigo);
+  text-decoration: none;
+  border-bottom: 1.5px solid rgba(46, 64, 87, 0.35);
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.tautan:hover {
+  color: var(--indigo-deep);
+  border-bottom-color: var(--indigo);
+}
+
+/* Label tulisan tangan ala papan harga warung */
+.tulis {
+  font-family: var(--font-tulis);
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+/* Sudut kartu sengaja tidak seragam: bagian atas rata (kayak papan lapak),
+   bawah sedikit tumpul. */
+.sudut-lapak {
+  border-radius: 0 0 3px 3px;
+}
+.sudut-papan {
+  border-radius: 2px;
+}
+
+/* Stempel "HABIS" */
+.stempel {
+  font-family: var(--font-display);
+  color: var(--status-habis);
+  border: 3px solid var(--status-habis);
+  transform: rotate(-11deg);
+  letter-spacing: 0.06em;
+  opacity: 0.9;
+}
+
+/* Baris lapak yang bisa digeser (dipakai di beranda) */
+.los-geser {
+  scrollbar-width: thin;
+  scrollbar-color: var(--wood-mid) transparent;
+}
+.los-geser::-webkit-scrollbar { height: 8px; }
+.los-geser::-webkit-scrollbar-track { background: rgba(62, 42, 30, 0.08); }
+.los-geser::-webkit-scrollbar-thumb {
+  background: var(--wood-mid);
+  border-radius: 2px;
+}
+
+/* Grid los pasar: tinggi kartu tidak seragam.
+   Pakai CSS columns supaya kartu menumpuk rapat seperti lapak berjejer. */
+.los-grid {
+  column-gap: 1.5rem;
+}
+.los-grid > * {
+  break-inside: avoid;
+  margin-bottom: 1.5rem;
+}
+@media (min-width: 640px) {
+  .los-grid { column-count: 2; }
+}
+@media (min-width: 1024px) {
+  .los-grid { column-count: 3; }
+}
+
+/* Hormati preferensi gerak minimal */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
