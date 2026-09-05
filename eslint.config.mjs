@@ -18,6 +18,11 @@ const eslintConfig = [
       'no-console': ['warn', { allow: ['warn', 'error'] }],
     },
   },
+  {
+    // Skrip pembangkit aset berjalan di terminal; console adalah antarmukanya.
+    files: ['scripts/**/*.mjs'],
+    rules: { 'no-console': 'off' },
+  },
 ];
 
 export default eslintConfig;

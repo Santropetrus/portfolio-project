@@ -26,6 +26,10 @@ Yang sudah berjalan:
 | Pengaturan | Profil, info organisasi, daftar anggota, audit log (owner/admin) |
 | Seed | Data demo opsional 21 bahan baku |
 
+Repo ini juga memuat satu halaman publik terpisah dari aplikasi operasional:
+**Fluid Studio** di `/studio` — situs portofolio studio desain fiktif dengan
+kubus 3D yang berputar mengikuti gulir. Lihat [§12](#12-halaman-fluid-studio-studio).
+
 ---
 
 ## 1. Arsitektur dan asumsi
@@ -105,6 +109,12 @@ PostgreSQL
 ├── postcss.config.mjs
 ├── tsconfig.json
 │
+├── scripts/
+│   └── buat-tekstur.mjs           Pembangkit tekstur SVG halaman Fluid Studio
+│
+├── public/
+│   └── tekstur/                   15 tekstur SVG hasil bangkitan (±15 KB)
+│
 ├── supabase/
 │   ├── migrations/
 │   │   ├── 20260101000000_init_schema.sql        Enum, tabel, indeks, updated_at
@@ -124,15 +134,18 @@ PostgreSQL
     │   ├── error.tsx              Kondisi error global
     │   ├── not-found.tsx
     │   ├── masuk/                 Halaman login
-    │   └── (dashboard)/
-    │       ├── layout.tsx         Penjaga sesi + kerangka aplikasi
-    │       ├── loading.tsx        Kondisi memuat
-    │       ├── error.tsx          Kondisi error per halaman
-    │       ├── dashboard/         Ringkasan, perlu perhatian, aktivitas
-    │       ├── inventori/         Tabel, cari, filter, CRUD
-    │       ├── stok-opname/       Form opname + riwayat
-    │       ├── riwayat-stok/      Jejak perubahan stok
-    │       └── pengaturan/        Profil, organisasi, anggota, audit log
+    │   ├── (dashboard)/
+    │   │   ├── layout.tsx         Penjaga sesi + kerangka aplikasi
+    │   │   ├── loading.tsx        Kondisi memuat
+    │   │   ├── error.tsx          Kondisi error per halaman
+    │   │   ├── dashboard/         Ringkasan, perlu perhatian, aktivitas
+    │   │   ├── inventori/         Tabel, cari, filter, CRUD
+    │   │   ├── stok-opname/       Form opname + riwayat
+    │   │   ├── riwayat-stok/      Jejak perubahan stok
+    │   │   └── pengaturan/        Profil, organisasi, anggota, audit log
+    │   └── studio/                Fluid Studio — halaman publik terpisah (§12)
+    │       ├── studio.css         Sistem desainnya sendiri
+    │       └── komponen/          Kubus 3D, gulir halus, penggaris, dll.
     │
     ├── components/
     │   ├── brand/logo.tsx
@@ -550,3 +563,59 @@ lonjakan pemakaian bahan.
 - Test end-to-end (Playwright) untuk alur login, CRUD, dan opname
 - CI: typecheck, lint, build, dan `rls_checks.sql` pada database sementara
 - Mode offline/PWA untuk stok opname di gudang dengan sinyal lemah
+
+---
+
+## 12. Halaman Fluid Studio (`/studio`)
+
+Selain aplikasi operasional, repo ini memuat satu halaman terpisah:
+**Fluid Studio** — situs portofolio studio desain fiktif di `/studio`, dibangun
+mengikuti sebuah referensi visual.
+
+### Cara melihatnya
+
+```bash
+npm run dev
+# lalu buka http://localhost:3000/studio
+```
+
+Halaman ini **publik** (terdaftar di `RUTE_PUBLIK` pada `src/proxy.ts`) dan
+tidak menyentuh database sama sekali, jadi bisa dibuka tanpa Supabase.
+
+### Yang membuatnya bergerak
+
+| Bagian | Cara kerja |
+| --- | --- |
+| **Kubus 3D** | Enam `<div>` dengan CSS `transform-style: preserve-3d` — bukan WebGL. Seksinya setinggi 320vh dengan panggung `position: sticky`, sehingga jarak gulir berubah menjadi sudut putar. |
+| **Gulir halus** | Roda mouse menggeser nilai *target*; posisi nyata mengejarnya sedikit demi sedikit tiap frame. Inilah yang membuat gulir terasa berat dan mulus. |
+| **Peredaman** | Semua nilai berbasis gulir (kubus, penggaris, teks berjalan) diredam menuju targetnya, bukan dipetakan langsung — sehingga gerakannya menyusul, tidak patah. |
+| **Penggaris kedalaman** | Indikator posisi gulir bergaya instrumen selam di tepi kanan. |
+| **Tekstur** | Seluruh citra dibangkitkan `feTurbulence` sebagai SVG (15 berkas, ±15 KB total), bukan foto. Regenerasi: `node scripts/buat-tekstur.mjs`. |
+
+### Catatan teknis yang penting
+
+**Halaman ini wajib dirender dinamis** (`export const dynamic = 'force-dynamic'`).
+CSP aplikasi memakai nonce yang dibangkitkan ulang setiap permintaan. Nonce itu
+hanya bisa menempel pada tag `<script>` bila halaman dirender saat permintaan
+datang. Bila di-prerender saat build, HTML membawa nonce lama sementara header
+membawa nonce baru — dan browser memblokir **seluruh** JavaScript halaman.
+Halamannya tetap tampil, tetapi mati total. Aturan yang sama berlaku untuk
+halaman apa pun yang ditambahkan ke aplikasi ini.
+
+**Gerak yang tidak memaksa.** Gulir halus dinonaktifkan pada perangkat sentuh
+dan saat pengguna meminta `prefers-reduced-motion`; Ctrl + roda (zoom) tetap
+diteruskan; scrollbar, tombol panah, Page Up/Down, dan tautan jangkar tetap
+bekerja karena posisi target disamakan kembali saat terdeteksi selisih.
+
+**Isi halaman berbahasa Inggris**, mengikuti referensinya — berbeda dengan
+Matcha Kyoto Ops yang seluruhnya berbahasa Indonesia. Studio, karya, dan
+alamat surel di dalamnya fiktif.
+
+### Batasan
+
+- Tekstur prosedural berbeda dari fotografi asli pada referensi. Menggantinya
+  dengan foto berarti menambahkan berkas gambar ke `public/` — CSP saat ini
+  hanya mengizinkan gambar dari origin sendiri, jadi CDN foto akan diblokir.
+- Kubus memakai CSS 3D, bukan WebGL. Cukup untuk satu volume; pemandangan yang
+  lebih rumit (banyak objek, pencahayaan, bayangan) akan membutuhkan Three.js.
+

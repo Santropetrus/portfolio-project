@@ -1,0 +1,904 @@
+/* ==========================================================================
+   Fluid Studio — sistem desain halaman
+   Ditulis sebagai CSS biasa, terpisah dari sistem desain Matcha Kyoto Ops.
+   Dua produk yang sangat berbeda; menyatukan tokennya hanya akan
+   membuat keduanya saling menarik ke arah yang salah.
+   ========================================================================== */
+
+.studio {
+  --kertas: #eff2ee;
+  --sage: #ccd9d1;
+  --sage-tua: #bccdc3;
+  --tinta: #16211c;
+  --tinta-70: rgba(22, 33, 28, 0.7);
+  --tinta-45: rgba(22, 33, 28, 0.45);
+  --tinta-22: rgba(22, 33, 28, 0.22);
+  --tinta-12: rgba(22, 33, 28, 0.12);
+  --gelap: #0b1310;
+  --teal: #1f5249;
+
+  --tepi: clamp(1.25rem, 3.4vw, 3.25rem);
+  --bilah: 3.25rem;
+  --penggaris: 4.5rem;
+
+  --mudah: cubic-bezier(0.22, 1, 0.36, 1);
+
+  position: relative;
+  min-height: 100dvh;
+  background: var(--kertas);
+  color: var(--tinta);
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  overflow-x: clip;
+}
+
+/* Latar dokumen ikut menggelap agar area overscroll tidak memperlihatkan
+   warna dari aplikasi lain di repo ini. */
+body:has(.studio) {
+  background: #eff2ee;
+}
+
+/*
+ * globals.css (sistem desain Matcha Kyoto Ops) memberi h1-h3 font serif.
+ * Aturan itu ikut terbawa ke halaman ini, jadi tipografi studio harus
+ * dinyatakan ulang secara eksplisit alih-alih mengandalkan pewarisan.
+ */
+.studio h1,
+.studio h2,
+.studio h3 {
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.03em;
+}
+
+.studio ::selection {
+  background: var(--tinta);
+  color: var(--kertas);
+}
+
+.studio :focus-visible {
+  outline: 2px solid var(--tinta);
+  outline-offset: 3px;
+}
+
+/* --------------------------------------------------------------------------
+   Tipografi
+   -------------------------------------------------------------------------- */
+.mono {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.judul-raksasa {
+  font-family: var(--font-inter), sans-serif;
+  font-weight: 900;
+  line-height: 0.8;
+  letter-spacing: -0.05em;
+  margin: 0;
+}
+
+.garis-luar {
+  font-family: var(--font-poppins), sans-serif;
+  font-weight: 500;
+  line-height: 0.85;
+  letter-spacing: -0.02em;
+  color: transparent;
+  -webkit-text-stroke: 1.4px var(--tinta);
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Lapisan tetap: butiran film, bilah atas, penggaris, pil navigasi
+   -------------------------------------------------------------------------- */
+.butiran {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  background-image: url('/tekstur/butiran.svg');
+  background-size: 220px 220px;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+}
+
+.bilah-atas {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 50;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1rem;
+  height: var(--bilah);
+  padding: 0 var(--tepi);
+  padding-right: calc(var(--tepi) + var(--penggaris));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+  /*
+   * `difference` dengan teks putih menghasilkan |255 - latar|: gelap di atas
+   * kertas, terang di atas seksi gelap. Satu elemen tetap, kontras selalu
+   * benar, tanpa perlu tahu seksi mana yang sedang lewat di belakangnya.
+   */
+  color: #ffffff;
+  mix-blend-mode: difference;
+}
+
+.bilah-atas__kanan {
+  justify-self: end;
+  text-align: right;
+}
+
+.bilah-atas__tanda {
+  font-weight: 800;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+}
+
+@media (max-width: 640px) {
+  .bilah-atas__kanan {
+    display: none;
+  }
+  .bilah-atas {
+    grid-template-columns: 1fr auto;
+  }
+}
+
+/* Penggaris kedalaman -------------------------------------------------- */
+.penggaris {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 45;
+  width: var(--penggaris);
+  height: 100dvh;
+  padding: calc(var(--bilah) + 0.75rem) 0 1.5rem;
+  pointer-events: none;
+  color: rgba(255, 255, 255, 0.55);
+  mix-blend-mode: difference;
+}
+
+.penggaris__batang {
+  position: relative;
+  height: 100%;
+  margin-right: 1.15rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.28);
+}
+
+.penggaris__tik {
+  position: absolute;
+  right: 0;
+  width: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.penggaris__tik--besar {
+  width: 1rem;
+  border-top-color: rgba(255, 255, 255, 0.55);
+}
+
+.penggaris__angka {
+  position: absolute;
+  right: 1.35rem;
+  transition: opacity 0.2s linear;
+  transform: translateY(-50%);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+}
+
+.penggaris__label {
+  position: absolute;
+  right: -0.15rem;
+  writing-mode: vertical-rl;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.penggaris__label--atas {
+  top: calc(var(--bilah) + 1rem);
+}
+
+.penggaris__label--bawah {
+  bottom: 1.5rem;
+}
+
+/* Penanda berbentuk belah ketupat yang menyusuri penggaris. */
+.penggaris__penanda {
+  position: absolute;
+  right: -0.3rem;
+  width: 0.6rem;
+  height: 0.6rem;
+  background: #ffffff;
+  transform: translateY(-50%) rotate(45deg);
+  will-change: top;
+}
+
+.penggaris__bacaan {
+  position: absolute;
+  z-index: 1;
+  right: 1.15rem;
+  transform: translateY(-50%);
+  padding: 0.15rem 0.25rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: #ffffff;
+  white-space: nowrap;
+  will-change: top;
+}
+
+@media (max-width: 860px) {
+  .studio {
+    --penggaris: 0rem;
+  }
+  .penggaris {
+    display: none;
+  }
+  .bilah-atas {
+    padding-right: var(--tepi);
+  }
+}
+
+/* Pil navigasi --------------------------------------------------------- */
+.pil {
+  position: fixed;
+  left: 50%;
+  bottom: clamp(1rem, 2.5vw, 1.75rem);
+  transform: translateX(-50%);
+  z-index: 55;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  width: min(30rem, calc(100vw - 2 * var(--tepi)));
+  height: 3.375rem;
+  padding: 0 0.4rem;
+  border-radius: 999px;
+  /* Sedikit lebih terang dari `--gelap` plus garis tepi, supaya pil tetap
+     terbaca sebagai objek ketika melayang di atas seksi kontak yang gelap. */
+  background: #141d19;
+  border: 1px solid rgba(231, 236, 233, 0.14);
+  color: #e7ece9;
+  box-shadow: 0 18px 40px -22px rgba(11, 19, 16, 0.9);
+}
+
+.pil__tombol {
+  display: grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color 0.25s var(--mudah);
+}
+
+.pil__tombol:hover {
+  background: rgba(231, 236, 233, 0.12);
+}
+
+.pil__tanda {
+  justify-self: center;
+  font-weight: 800;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+}
+
+/* Overlay menu --------------------------------------------------------- */
+.menu {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--bilah) var(--tepi) 7rem;
+  background: var(--gelap);
+  color: var(--kertas);
+}
+
+.menu__daftar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.menu__tautan {
+  display: flex;
+  align-items: baseline;
+  gap: 1.25rem;
+  padding: 0.35rem 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font-family: var(--font-inter), sans-serif;
+  font-weight: 800;
+  font-size: clamp(2.25rem, 8vw, 5.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  text-align: left;
+  cursor: pointer;
+  opacity: 0.55;
+  transition:
+    opacity 0.3s var(--mudah),
+    transform 0.4s var(--mudah);
+}
+
+.menu__tautan:hover,
+.menu__tautan:focus-visible {
+  opacity: 1;
+  transform: translateX(0.75rem);
+}
+
+.menu__indeks {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.22em;
+  opacity: 0.55;
+}
+
+.menu__tutup {
+  position: absolute;
+  top: 1rem;
+  right: var(--tepi);
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid rgba(239, 242, 238, 0.25);
+  border-radius: 999px;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.menu__kaki {
+  position: absolute;
+  left: var(--tepi);
+  right: var(--tepi);
+  bottom: 1.75rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  opacity: 0.6;
+}
+
+/* --------------------------------------------------------------------------
+   Seksi hero
+   -------------------------------------------------------------------------- */
+.hero {
+  position: relative;
+  min-height: 100dvh;
+  padding: calc(var(--bilah) + clamp(1.5rem, 5vh, 4rem)) var(--tepi) 0;
+  padding-right: calc(var(--tepi) + var(--penggaris));
+  overflow: clip;
+}
+
+.hero__kabut {
+  position: absolute;
+  inset: -22% -18% -18% 16%;
+  z-index: 0;
+  background-image: url('/tekstur/kabut-1.svg');
+  background-size: cover;
+  background-position: 60% 40%;
+  opacity: 0.66;
+  filter: blur(1.5px);
+  /* Tanpa mask, persegi panjang kabut memperlihatkan tepi lurus yang tajam
+     di sisi kiri — langsung terbaca sebagai gambar, bukan kabut. */
+  mask-image: radial-gradient(72% 78% at 60% 45%, #000 12%, transparent 72%);
+  will-change: transform;
+}
+
+.hero__kabut--dua {
+  inset: -10% -28% -2% 32%;
+  background-image: url('/tekstur/kabut-2.svg');
+  background-position: 30% 60%;
+  opacity: 0.4;
+  filter: blur(9px);
+  mask-image: radial-gradient(68% 72% at 55% 55%, #000 10%, transparent 68%);
+}
+
+.hero__isi {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-height: calc(100dvh - var(--bilah) - 4rem);
+  flex-direction: column;
+}
+
+.hero__judul {
+  font-size: clamp(4.5rem, 21vw, 20rem);
+}
+
+.hero__sub {
+  margin-left: clamp(2rem, 17vw, 19rem);
+  margin-top: clamp(-1rem, -1.5vw, 0rem);
+  font-size: clamp(3.75rem, 17.5vw, 16.5rem);
+}
+
+/* Garis titik-titik diagonal, meniru penanda teknis pada referensi. */
+.hero__garis-titik {
+  position: absolute;
+  top: 58%;
+  left: 19%;
+  width: min(15rem, 20vw);
+  height: 7rem;
+  z-index: 1;
+  pointer-events: none;
+  color: var(--tinta);
+}
+
+.hero__bawah {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 22rem) minmax(0, 1fr);
+  align-items: end;
+  gap: clamp(1.5rem, 4vw, 3rem);
+  margin-top: auto;
+  padding-bottom: clamp(5rem, 9vh, 7rem);
+}
+
+.hero__deskripsi {
+  max-width: 22rem;
+  margin: 0;
+  font-size: clamp(0.875rem, 1.05vw, 1rem);
+  line-height: 1.55;
+  color: var(--tinta-70);
+}
+
+.pita {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  border: 1px solid var(--tinta-22);
+  border-right: 0;
+}
+
+.pita__sel {
+  position: relative;
+  border-right: 1px solid var(--tinta-22);
+  padding: 0.5rem;
+  overflow: hidden;
+}
+
+.pita__gambar {
+  aspect-ratio: 4 / 5;
+  background-size: cover;
+  background-position: center;
+  transform: scale(1);
+  transition: transform 0.7s var(--mudah);
+}
+
+.pita__sel:hover .pita__gambar {
+  transform: scale(1.08);
+}
+
+.pita__nomor {
+  position: absolute;
+  left: 0.5rem;
+  bottom: 0.35rem;
+  color: var(--tinta-45);
+}
+
+@media (max-width: 900px) {
+  .hero__bawah {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+  .pita {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .pita__sel:nth-child(n + 4) {
+    display: none;
+  }
+  .hero__garis-titik {
+    display: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Seksi kubus
+   -------------------------------------------------------------------------- */
+.seksi-kubus {
+  position: relative;
+  /* Tinggi ekstra inilah yang memberi kubus ruang untuk berputar. */
+  height: 320vh;
+  background: var(--sage);
+}
+
+.seksi-kubus__lengket {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  overflow: clip;
+}
+
+.marquee {
+  position: absolute;
+  top: clamp(1.5rem, 6vh, 4rem);
+  left: 0;
+  right: 0;
+  overflow: clip;
+  /* Sedikit di belakang kubus supaya kubus lewat menutupinya. */
+  z-index: 0;
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+
+.marquee__geser {
+  will-change: transform;
+}
+
+/*
+ * Dua lapis gerak: `.marquee__jalur` berjalan terus lewat animasi CSS,
+ * sementara `.marquee__geser` di atasnya digeser oleh posisi gulir. Hasilnya
+ * teks tetap mengalir saat halaman diam, dan ikut terdorong saat digulir.
+ */
+.marquee__jalur {
+  display: flex;
+  width: max-content;
+  animation: marquee-berjalan 38s linear infinite;
+}
+
+.marquee__grup {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  padding-right: clamp(1.5rem, 4vw, 3.5rem);
+}
+
+.marquee__butir {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(0.5rem, 1.2vw, 1rem);
+}
+
+@keyframes marquee-berjalan {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee__jalur {
+    animation: none;
+  }
+}
+
+.marquee__kata {
+  font-family: var(--font-inter), sans-serif;
+  font-weight: 900;
+  font-size: clamp(3rem, 9.5vw, 9.5rem);
+  line-height: 0.9;
+  letter-spacing: -0.045em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.marquee__label {
+  color: var(--tinta-45);
+  white-space: nowrap;
+}
+
+.kubus-panggung {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  perspective: 1500px;
+  z-index: 1;
+}
+
+.kubus {
+  --sisi: clamp(10rem, 26vw, 22rem);
+  position: relative;
+  width: var(--sisi);
+  height: var(--sisi);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.kubus__sisi {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  backface-visibility: hidden;
+  box-shadow: inset 0 0 0 1px rgba(231, 236, 233, 0.08);
+}
+
+.kubus__sisi--depan {
+  transform: translateZ(calc(var(--sisi) / 2));
+}
+.kubus__sisi--belakang {
+  transform: rotateY(180deg) translateZ(calc(var(--sisi) / 2));
+}
+.kubus__sisi--kanan {
+  transform: rotateY(90deg) translateZ(calc(var(--sisi) / 2));
+}
+.kubus__sisi--kiri {
+  transform: rotateY(-90deg) translateZ(calc(var(--sisi) / 2));
+}
+.kubus__sisi--atas {
+  transform: rotateX(90deg) translateZ(calc(var(--sisi) / 2));
+}
+.kubus__sisi--bawah {
+  transform: rotateX(-90deg) translateZ(calc(var(--sisi) / 2));
+}
+
+.seksi-kubus__kaki {
+  position: absolute;
+  left: var(--tepi);
+  right: calc(var(--tepi) + var(--penggaris));
+  bottom: clamp(5rem, 9vh, 7rem);
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--tinta-45);
+}
+
+/* --------------------------------------------------------------------------
+   Seksi karya
+   -------------------------------------------------------------------------- */
+.seksi {
+  position: relative;
+  padding: clamp(5rem, 14vh, 10rem) var(--tepi);
+  padding-right: calc(var(--tepi) + var(--penggaris));
+}
+
+.seksi--kertas {
+  background: var(--kertas);
+}
+
+.seksi--sage {
+  background: var(--sage);
+}
+
+.seksi--gelap {
+  background: var(--gelap);
+  color: var(--kertas);
+}
+
+.seksi__kepala {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--tinta-22);
+}
+
+.seksi--gelap .seksi__kepala {
+  border-bottom-color: rgba(239, 242, 238, 0.2);
+}
+
+.seksi__judul {
+  font-family: var(--font-inter), sans-serif;
+  font-weight: 900;
+  font-size: clamp(2.25rem, 6vw, 5rem);
+  line-height: 0.9;
+  letter-spacing: -0.045em;
+  margin: 0;
+}
+
+.karya {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(20rem, 100%), 1fr));
+  gap: clamp(1.25rem, 2.5vw, 2.25rem);
+  margin-top: clamp(2rem, 5vw, 3.5rem);
+}
+
+.karya__kartu {
+  display: block;
+  /* `<button>` adalah form control: lebarnya tetap menyusut ke isi meskipun
+     sudah display:block, jadi kolom grid harus dipenuhi secara eksplisit. */
+  width: 100%;
+  border: 0;
+  background: none;
+  padding: 0;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.karya__bingkai {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  background: var(--gelap);
+}
+
+.karya__gambar {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transform: scale(1.02);
+  transition: transform 0.9s var(--mudah);
+}
+
+.karya__kartu:hover .karya__gambar,
+.karya__kartu:focus-visible .karya__gambar {
+  transform: scale(1.1);
+}
+
+.karya__nomor {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 1;
+  color: rgba(231, 236, 233, 0.85);
+}
+
+.karya__meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 0.75rem;
+}
+
+.karya__nama {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+
+.karya__kategori {
+  color: var(--tinta-45);
+}
+
+/* --------------------------------------------------------------------------
+   Kapabilitas — dibaca seperti lembar spesifikasi
+   -------------------------------------------------------------------------- */
+.kapabilitas {
+  margin-top: clamp(2rem, 5vw, 3.5rem);
+  border-top: 1px solid var(--tinta-22);
+}
+
+.kapabilitas__baris {
+  display: grid;
+  grid-template-columns: 4rem minmax(0, 14rem) minmax(0, 1fr);
+  gap: clamp(1rem, 3vw, 2.5rem);
+  align-items: start;
+  padding: clamp(1.25rem, 2.5vw, 2rem) 0;
+  border-bottom: 1px solid var(--tinta-22);
+}
+
+.kapabilitas__nama {
+  font-size: clamp(1.25rem, 2.4vw, 2rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin: 0;
+}
+
+.kapabilitas__teks {
+  max-width: 42rem;
+  margin: 0;
+  color: var(--tinta-70);
+  line-height: 1.6;
+  font-size: clamp(0.875rem, 1.05vw, 1rem);
+}
+
+@media (max-width: 760px) {
+  .kapabilitas__baris {
+    grid-template-columns: 2.5rem 1fr;
+  }
+  .kapabilitas__teks {
+    grid-column: 2;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Kontak
+   -------------------------------------------------------------------------- */
+.kontak__judul {
+  font-family: var(--font-inter), sans-serif;
+  font-weight: 900;
+  font-size: clamp(2.5rem, 9vw, 8rem);
+  line-height: 0.86;
+  letter-spacing: -0.05em;
+  margin: clamp(2rem, 5vw, 3.5rem) 0 0;
+}
+
+.kontak__surel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: clamp(1.5rem, 3vw, 2.5rem);
+  font-size: clamp(1.125rem, 2.6vw, 2rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(239, 242, 238, 0.35);
+  padding-bottom: 0.15rem;
+  transition: border-color 0.3s var(--mudah);
+}
+
+.kontak__surel:hover {
+  border-bottom-color: var(--kertas);
+}
+
+.kontak__kisi {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(11rem, 100%), 1fr));
+  gap: 1.5rem;
+  margin-top: clamp(3rem, 8vw, 6rem);
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(239, 242, 238, 0.2);
+  color: rgba(239, 242, 238, 0.6);
+}
+
+.kontak__nilai {
+  display: block;
+  margin-top: 0.4rem;
+  color: var(--kertas);
+  letter-spacing: 0.08em;
+}
+
+.kontak__kaki {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: clamp(3rem, 7vw, 5rem);
+  padding-bottom: 3.5rem;
+  color: rgba(239, 242, 238, 0.45);
+}
+
+/* --------------------------------------------------------------------------
+   Animasi masuk saat elemen tersingkap
+   -------------------------------------------------------------------------- */
+.tersingkap {
+  opacity: 0;
+  transform: translateY(1.5rem);
+  transition:
+    opacity 0.9s var(--mudah),
+    transform 0.9s var(--mudah);
+}
+
+.tersingkap[data-tampil='ya'] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Jeda bertingkat supaya elemen tidak muncul serempak. */
+.tersingkap[data-jeda='1'] {
+  transition-delay: 0.08s;
+}
+.tersingkap[data-jeda='2'] {
+  transition-delay: 0.16s;
+}
+.tersingkap[data-jeda='3'] {
+  transition-delay: 0.24s;
+}
+.tersingkap[data-jeda='4'] {
+  transition-delay: 0.32s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .studio *,
+  .studio *::before,
+  .studio *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .tersingkap {
+    opacity: 1;
+    transform: none;
+  }
+}

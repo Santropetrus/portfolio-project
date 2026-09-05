@@ -15,7 +15,7 @@ import { supabaseOrigin } from '@/lib/env';
  * (lihat src/lib/auth/session.ts) dan di database lewat Row Level Security.
  */
 
-const RUTE_PUBLIK = ['/masuk'];
+const RUTE_PUBLIK = ['/masuk', '/studio'];
 const RUTE_MASUK = '/masuk';
 const RUTE_BERANDA = '/dashboard';
 
