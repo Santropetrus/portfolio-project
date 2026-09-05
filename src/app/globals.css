@@ -1,0 +1,230 @@
+@import 'tailwindcss';
+
+/* ==========================================================================
+   The Matcha Kyoto Ops — token desain
+   Palet: matcha green, putih gading, beige, aksen cokelat kayu.
+   ========================================================================== */
+@theme {
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-serif: var(--font-mincho), 'Hiragino Mincho ProN', 'Yu Mincho', ui-serif, Georgia, serif;
+  --font-weight-serif: 600;
+
+  /* Putih gading — latar utama aplikasi */
+  --color-gading-50: #fdfbf6;
+  --color-gading-100: #faf6ed;
+  --color-gading-200: #f4eee1;
+
+  /* Beige — permukaan sekunder, garis pemisah */
+  --color-beige-100: #f0e8d8;
+  --color-beige-200: #e5d9c3;
+  --color-beige-300: #d6c5a7;
+  --color-beige-400: #c2ab86;
+
+  /* Matcha — warna merek utama */
+  --color-matcha-50: #f2f7ec;
+  --color-matcha-100: #e1efd3;
+  --color-matcha-200: #c5deac;
+  --color-matcha-300: #a3c983;
+  --color-matcha-400: #84b262;
+  --color-matcha-500: #689a4a;
+  --color-matcha-600: #517b39;
+  --color-matcha-700: #3f5f2e;
+  --color-matcha-800: #334b27;
+  --color-matcha-900: #223318;
+  --color-matcha-950: #16210f;
+
+  /* Cokelat kayu — aksen hangat */
+  --color-kayu-100: #f2e7d9;
+  --color-kayu-200: #e3cfb4;
+  --color-kayu-300: #cfae84;
+  --color-kayu-400: #b98f5c;
+  --color-kayu-500: #a07543;
+  --color-kayu-600: #855c34;
+  --color-kayu-700: #6a482a;
+
+  /* Tinta — teks hangat, bukan hitam murni */
+  --color-tinta-400: #8b8478;
+  --color-tinta-500: #6f6759;
+  --color-tinta-600: #565044;
+  --color-tinta-700: #423d34;
+  --color-tinta-800: #2f2b25;
+  --color-tinta-900: #211e19;
+
+  /* Status stok */
+  --color-status-aman: #4f7c37;
+  --color-status-aman-bg: #eaf3e0;
+  --color-status-menipis: #a26207;
+  --color-status-menipis-bg: #fbf0d9;
+  --color-status-habis: #a8362c;
+  --color-status-habis-bg: #f9e5e2;
+
+  --radius-kartu: 1rem;
+
+  --shadow-lembut: 0 1px 2px rgb(50 40 25 / 0.04), 0 12px 28px -18px rgb(50 40 25 / 0.28);
+  --shadow-angkat: 0 2px 4px rgb(50 40 25 / 0.05), 0 18px 40px -22px rgb(50 40 25 / 0.35);
+}
+
+/* ==========================================================================
+   Dasar
+   ========================================================================== */
+@layer base {
+  * {
+    border-color: var(--color-beige-200);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-gading-50);
+    color: var(--color-tinta-800);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    letter-spacing: -0.005em;
+  }
+
+  /*
+   * Utilitas font-serif dipakai juga untuk angka besar pada kartu statistik.
+   * `lining-nums` penting: angka gaya lama (oldstyle) naik-turun sehingga
+   * KPI seperti "8.452.000" jadi sulit dibaca sekilas.
+   */
+  .font-serif {
+    font-weight: 600;
+    font-variant-numeric: lining-nums;
+  }
+
+  /* Cincin fokus yang terlihat jelas — penting untuk aksesibilitas keyboard. */
+  :focus-visible {
+    outline: 2px solid var(--color-matcha-600);
+    outline-offset: 2px;
+    border-radius: 0.35rem;
+  }
+
+  ::selection {
+    background-color: var(--color-matcha-200);
+    color: var(--color-matcha-900);
+  }
+
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button {
+    appearance: none;
+    margin: 0;
+  }
+
+  input[type='number'] {
+    -moz-appearance: textfield;
+  }
+}
+
+/* ==========================================================================
+   Utilitas khas merek
+   ========================================================================== */
+/*
+ * Permukaan gelap khas merek: gradasi matcha ditumpuk butiran halus
+ * menyerupai serat kertas washi. Keduanya digabung dalam SATU utility
+ * karena `background-image` hanya bisa dimiliki satu deklarasi — memisahnya
+ * membuat salah satu saling menimpa.
+ */
+@utility panel-matcha {
+  background-color: var(--color-matcha-900);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='b'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23b)' opacity='0.05'/%3E%3C/svg%3E"),
+    linear-gradient(
+      155deg,
+      var(--color-matcha-800) 0%,
+      var(--color-matcha-900) 58%,
+      var(--color-matcha-950) 100%
+    );
+  background-size: 180px 180px, cover;
+  background-repeat: repeat, no-repeat;
+}
+
+@utility garis-kuas {
+  /* Garis bawah menyerupai sapuan kuas. */
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--color-matcha-400) 12%,
+    var(--color-matcha-600) 50%,
+    var(--color-matcha-400) 88%,
+    transparent 100%
+  );
+}
+
+/* Scrollbar ramping bernuansa hangat. */
+@layer utilities {
+  .scroll-halus {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-beige-300) transparent;
+  }
+
+  .scroll-halus::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .scroll-halus::-webkit-scrollbar-thumb {
+    background-color: var(--color-beige-300);
+    border-radius: 9999px;
+  }
+
+  .scroll-halus::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+/* ==========================================================================
+   Animasi
+   ========================================================================== */
+@keyframes muncul-halus {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes geser-masuk {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@layer utilities {
+  .animasi-muncul {
+    animation: muncul-halus 0.28s ease-out both;
+  }
+
+  .animasi-geser {
+    animation: geser-masuk 0.24s ease-out both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
