@@ -4,6 +4,7 @@ import { cache } from 'react';
 import { redirect } from 'next/navigation';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
+import { isSupabaseConfigured } from '@/lib/env';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import type { Profile, UserRole } from '@/types/database';
 
@@ -26,6 +27,10 @@ export interface KonteksSesi {
  * Dibungkus `cache()` agar satu render tidak memanggil berkali-kali.
  */
 export const ambilSesi = cache(async (): Promise<KonteksSesi | null> => {
+  // Jaring pengaman untuk Server Action yang dipanggil tanpa melewati penjaga
+  // di halaman: tanpa konfigurasi, anggap saja tidak ada sesi.
+  if (!isSupabaseConfigured) return null;
+
   const supabase = await createSupabaseServerClient();
 
   const {

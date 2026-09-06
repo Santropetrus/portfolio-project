@@ -37,3 +37,7 @@ yarn-error.log*
 # supabase cli
 /supabase/.branches
 /supabase/.temp
+
+# dibuat otomatis oleh `next dev` (instruksi untuk AI agent, bukan bagian proyek)
+AGENTS.md
+CLAUDE.md

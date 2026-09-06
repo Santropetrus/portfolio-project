@@ -8,17 +8,14 @@ import { Kapabilitas, Karya, Kontak } from './komponen/seksi-statis';
 /**
  * Halaman Fluid Studio.
  *
- * Halaman publik — tidak memerlukan sesi. Lihat `RUTE_PUBLIK` di src/proxy.ts.
+ * Halaman publik — tidak memerlukan sesi maupun Supabase.
  *
- * WAJIB dirender dinamis meskipun isinya sepenuhnya statis.
- * Content-Security-Policy aplikasi ini memakai nonce yang dibangkitkan ulang
- * pada setiap permintaan (src/proxy.ts). Nonce itu hanya bisa ditempelkan ke
- * tag <script> Next bila halaman dirender saat permintaan datang. Bila
- * halaman di-prerender saat build, HTML-nya membawa nonce lama (atau tidak
- * sama sekali) sementara header membawa nonce baru — dan browser memblokir
- * SELURUH JavaScript halaman. Halaman tetap tampil, tapi mati total.
+ * Dirender statis. Dulu halaman ini dipaksa dinamis supaya tag <script> Next
+ * bisa menerima nonce per-request dari middleware; sekarang `/studio` sudah
+ * dikecualikan dari middleware (lihat `config.matcher` di src/proxy.ts) dan
+ * memakai CSP statis dari next.config.ts, jadi prerender statis kembali aman
+ * sekaligus membuat halaman ini terbuka tanpa konfigurasi apa pun.
  */
-export const dynamic = 'force-dynamic';
 export default function HalamanStudio() {
   return (
     <>

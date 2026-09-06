@@ -191,9 +191,33 @@ PostgreSQL
 
 ## 4. Environment variables
 
+Salin `.env.example` menjadi `.env.local`. Perintahnya berbeda per shell —
+pakai yang sesuai dengan terminal Anda:
+
+**Windows — Command Prompt (cmd.exe)**
+
+```bat
+copy .env.example .env.local
+```
+
+**Windows — PowerShell**
+
+```powershell
+Copy-Item .env.example .env.local
+```
+
+**macOS, Linux, Git Bash, WSL**
+
 ```bash
 cp .env.example .env.local
 ```
+
+> Perhatikan: `cp` **tidak ada** di Command Prompt. Bila Anda menempelkan
+> perintah `cp` ke cmd.exe, yang muncul hanya pesan
+> `'cp' is not recognized as an internal or external command` — berkasnya
+> diam-diam tidak terbuat, dan aplikasi akan menampilkan halaman
+> "Supabase belum dikonfigurasi". Pastikan `.env.local` benar-benar ada
+> sebelum melanjutkan (`dir .env.local` di cmd, `ls -a` di bash).
 
 Isi `.env.local`:
 
@@ -208,10 +232,25 @@ biarkan kosong — Tahap 1 tidak memakainya.
 
 `.env.local` sudah masuk `.gitignore`. Jangan pernah di-commit.
 
-> Aplikasi menolak start bila `NEXT_PUBLIC_SUPABASE_URL` atau
-> `NEXT_PUBLIC_SUPABASE_ANON_KEY` kosong/tidak valid — lihat `src/lib/env.ts`.
+### Restart dev server setelah membuat .env.local
 
----
+**Next.js membaca berkas `.env` hanya sekali, saat proses dijalankan.** Kalau
+`npm run dev` sudah berjalan ketika Anda membuat atau mengubah `.env.local`,
+server itu tidak akan melihat perubahannya — Anda akan terus melihat halaman
+"Supabase belum dikonfigurasi" walaupun berkasnya sudah benar.
+
+Hentikan dengan `Ctrl+C`, lalu jalankan ulang:
+
+```bash
+npm run dev
+```
+
+### Kalau konfigurasinya belum ada
+
+Aplikasi tidak akan mati. Route yang membutuhkan database (`/`, `/masuk`,
+`/dashboard`, dan seterusnya) menampilkan halaman penjelasan berisi langkah
+setup, sedangkan `/studio` tetap terbuka normal karena tidak menyentuh
+Supabase sama sekali.
 
 ## 5. Menjalankan migration
 
@@ -309,6 +348,21 @@ npm install
 npm run dev          # http://localhost:3000
 ```
 
+Urutan yang aman untuk pertama kali:
+
+1. `npm install`
+2. Buat `.env.local` (bagian 4) — **sebelum** menjalankan dev server.
+3. Jalankan migration (bagian 5) dan tetapkan owner pertama (bagian 6).
+4. `npm run dev`
+
+Kalau dev server terlanjur berjalan sebelum `.env.local` dibuat, hentikan
+dengan `Ctrl+C` dan jalankan ulang. Next.js hanya membaca berkas `.env` saat
+proses dijalankan.
+
+Ingin langsung melihat sesuatu tanpa Supabase? Jalankan `npm install` lalu
+`npm run dev`, dan buka **http://localhost:3000/studio** — halaman itu tidak
+menyentuh database sama sekali.
+
 Perintah lain:
 
 ```bash
@@ -325,9 +379,13 @@ npm run start        # menjalankan hasil build
 
 ### Cek cepat setelah pertama kali jalan
 
-1. Buka `http://localhost:3000` → harus dialihkan ke `/masuk`.
-2. Login dengan akun owner → harus mendarat di `/dashboard`.
-3. Buka `/inventori` → bila seed dijalankan, terlihat 21 bahan dengan badge
+1. Buka `http://localhost:3000/studio` → harus tampil normal, bahkan sebelum
+   Supabase dikonfigurasi.
+2. Buka `http://localhost:3000` → bila `.env.local` belum ada, muncul halaman
+   "Supabase belum dikonfigurasi" berisi langkah setup. Bila sudah ada, Anda
+   dialihkan ke `/masuk`.
+3. Login dengan akun owner → harus mendarat di `/dashboard`.
+4. Buka `/inventori` → bila seed dijalankan, terlihat 21 bahan dengan badge
    status aman/menipis/habis.
 
 ---

@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
+import { isSupabaseConfigured, supabaseOrigin } from '@/lib/env';
 import { createSupabaseProxyClient } from '@/lib/supabase/proxy';
-import { supabaseOrigin } from '@/lib/env';
 
 /**
  * Proxy (dulu bernama middleware) menangani tiga hal:
@@ -13,9 +13,13 @@ import { supabaseOrigin } from '@/lib/env';
  * PENTING: pengalihan di sini adalah kenyamanan, BUKAN batas keamanan.
  * Otorisasi sesungguhnya tetap dilakukan di Server Component / Server Action
  * (lihat src/lib/auth/session.ts) dan di database lewat Row Level Security.
+ *
+ * Berkas ini berjalan sebelum route mana pun dirender, jadi ia harus tetap
+ * hidup walau konfigurasi belum lengkap. Tidak ada satu pun impor di sini yang
+ * boleh melempar saat modulnya dievaluasi.
  */
 
-const RUTE_PUBLIK = ['/masuk', '/studio'];
+const RUTE_PUBLIK = ['/masuk'];
 const RUTE_MASUK = '/masuk';
 const RUTE_BERANDA = '/dashboard';
 
@@ -28,6 +32,13 @@ function buatNonce(): string {
 function bangunCsp(nonce: string): string {
   const dev = process.env.NODE_ENV !== 'production';
 
+  // Bila Supabase belum dikonfigurasi, directive-nya cukup dilewati. Menyusun
+  // string dari nilai null hanya akan menghasilkan "connect-src 'self' null".
+  const asalSupabase = supabaseOrigin();
+  const sumberKoneksi = ["'self'", asalSupabase, dev ? 'ws: http://localhost:*' : null]
+    .filter(Boolean)
+    .join(' ');
+
   const direktif = [
     `default-src 'self'`,
     // 'strict-dynamic' membuat skrip yang di-load oleh skrip ber-nonce ikut
@@ -37,7 +48,7 @@ function bangunCsp(nonce: string): string {
     `style-src 'self' 'unsafe-inline'`,
     `img-src 'self' blob: data:`,
     `font-src 'self' data:`,
-    `connect-src 'self' ${supabaseOrigin} ${dev ? 'ws: http://localhost:*' : ''}`.trim(),
+    `connect-src ${sumberKoneksi}`,
     `frame-src 'none'`,
     `frame-ancestors 'none'`,
     `object-src 'none'`,
@@ -68,6 +79,14 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
 
   const response = NextResponse.next({ request: { headers: requestHeaders } });
   response.headers.set('content-security-policy', csp);
+
+  // Tanpa konfigurasi Supabase tidak ada sesi yang bisa diperiksa, dan
+  // membuat client-nya hanya akan melempar. Header keamanan tetap terpasang;
+  // halaman yang membutuhkan database menampilkan panduan setup sendiri
+  // (lihat src/components/setup/perlu-konfigurasi.tsx).
+  if (!isSupabaseConfigured) {
+    return response;
+  }
 
   const supabase = createSupabaseProxyClient(request, response);
 
@@ -107,8 +126,18 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
 export const config = {
   matcher: [
     /*
-     * Lewati aset statis dan berkas gambar; sisanya melalui proxy.
+     * Yang TIDAK dilewatkan ke proxy:
+     *
+     * - `/studio` — halaman publik yang tidak menyentuh Supabase sama sekali.
+     *   Ia harus tetap terbuka walau proyek belum dikonfigurasi, jadi ia tidak
+     *   boleh bergantung pada middleware.
+     * - `/_next/...` — aset build, gambar hasil optimasi, dan data RSC.
+     * - Berkas statis di /public beserta ekstensi aset yang umum.
+     *
+     * CSP tetap terpasang untuk seluruh route lain. `/studio` mendapat header
+     * keamanan statisnya dari next.config.ts; ia tidak memakai skrip inline
+     * sehingga tidak membutuhkan nonce.
      */
-    '/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico|woff|woff2|ttf)$).*)',
+    '/((?!studio(?:$|/)|_next/|favicon\\.ico$|robots\\.txt$|sitemap\\.xml$|tekstur/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico|woff|woff2|ttf|txt|xml|json)$).*)',
   ],
 };

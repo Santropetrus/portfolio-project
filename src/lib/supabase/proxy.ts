@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import type { NextRequest, NextResponse } from 'next/server';
 
-import { env } from '@/lib/env';
+import { getEnv } from '@/lib/env';
 import { supabaseCookieOptions } from './cookies';
 
 /**
@@ -10,6 +10,10 @@ import { supabaseCookieOptions } from './cookies';
  * di request yang sama sudah melihat sesi terbaru.
  */
 export function createSupabaseProxyClient(request: NextRequest, response: NextResponse) {
+  // Dibaca saat dipanggil, bukan saat modul dimuat. Pemanggil sudah memastikan
+  // `isSupabaseConfigured` bernilai true sebelum sampai ke sini.
+  const env = getEnv();
+
   return createServerClient(env.NEXT_PUBLIC_SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_ANON_KEY, {
     cookieOptions: supabaseCookieOptions,
     cookies: {

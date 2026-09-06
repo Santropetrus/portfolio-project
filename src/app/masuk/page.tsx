@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 
 import { LogoMatcha } from '@/components/brand/logo';
+import { PerluKonfigurasi } from '@/components/setup/perlu-konfigurasi';
 import { APP_NAME, APP_TAGLINE } from '@/lib/constants';
+import { isSupabaseConfigured } from '@/lib/env';
 import { FormMasuk } from './form-masuk';
 
 export const metadata: Metadata = {
@@ -14,6 +16,10 @@ export default async function HalamanMasuk({
   searchParams: Promise<{ lanjut?: string }>;
 }) {
   const { lanjut } = await searchParams;
+
+  if (!isSupabaseConfigured) {
+    return <PerluKonfigurasi />;
+  }
 
   return (
     <main className="grid min-h-dvh lg:grid-cols-[1.05fr_1fr]">
