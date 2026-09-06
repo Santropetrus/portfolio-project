@@ -86,6 +86,10 @@ export interface StockOpname {
   catatan: string | null;
   created_by: string | null;
   created_at: string;
+  status: OpnameStatus;
+  ditinjau_oleh: string | null;
+  ditinjau_pada: string | null;
+  catatan_peninjau: string | null;
 }
 
 export interface AuditLog {
@@ -105,4 +109,7 @@ export interface RingkasanInventori {
   stok_menipis: number;
   stok_habis: number;
   nilai_persediaan: number;
+  opname_menunggu: number;
 }
+
+export type OpnameStatus = 'draft' | 'disetujui' | 'ditolak';

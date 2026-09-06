@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 
 import { JudulHalaman } from '@/components/layout/shell';
 import { FormProfil } from '@/components/pengaturan/form-profil';
@@ -18,6 +19,8 @@ const LABEL_AKSI: Record<string, string> = {
   'inventory_item.update': 'Mengubah bahan baku',
   'inventory_item.delete': 'Menghapus bahan baku',
   'stock_opname.create': 'Mencatat stok opname',
+  'stock_opname.approve': 'Menyetujui stok opname',
+  'stock_opname.reject': 'Menolak stok opname',
   'profile.update_sensitive': 'Mengubah role atau status akun',
 };
 
@@ -56,7 +59,8 @@ export default async function HalamanPengaturan() {
   return (
     <>
       <JudulHalaman
-        judul="Pengaturan"
+        label="Pengaturan"
+        judul="Akun & organisasi"
         deskripsi="Informasi akun, organisasi, dan hak akses Anda."
       />
 
@@ -67,17 +71,17 @@ export default async function HalamanPengaturan() {
           <div className="border-t border-beige-200 px-5 py-4">
             <dl className="grid gap-3 text-sm sm:grid-cols-2">
               <div>
-                <dt className="text-xs text-tinta-400">Email</dt>
-                <dd className="mt-0.5 break-all text-tinta-700">{email ?? '—'}</dd>
+                <dt className="mono-label text-tinta-400">Email</dt>
+                <dd className="mt-1 break-all text-tinta-700">{email ?? '—'}</dd>
               </div>
               <div>
-                <dt className="text-xs text-tinta-400">Role</dt>
+                <dt className="mono-label text-tinta-400">Role</dt>
                 <dd className="mt-0.5">
                   <BadgeNetral>{LABEL_ROLE[profile.role]}</BadgeNetral>
                 </dd>
               </div>
               <div className="sm:col-span-2">
-                <dt className="text-xs text-tinta-400">Hak akses</dt>
+                <dt className="mono-label text-tinta-400">Hak akses</dt>
                 <dd className="mt-0.5 text-tinta-600">{DESKRIPSI_ROLE[profile.role]}</dd>
               </div>
             </dl>
@@ -92,26 +96,26 @@ export default async function HalamanPengaturan() {
           <IsiKartu>
             <dl className="grid gap-3 text-sm sm:grid-cols-2">
               <div>
-                <dt className="text-xs text-tinta-400">Nama usaha</dt>
+                <dt className="mono-label text-tinta-400">Nama usaha</dt>
                 <dd className="mt-0.5 font-medium text-tinta-800">{organisasi?.nama ?? '—'}</dd>
               </div>
               <div>
-                <dt className="text-xs text-tinta-400">Pengenal</dt>
+                <dt className="mono-label text-tinta-400">Pengenal</dt>
                 <dd className="mt-0.5 text-tinta-600">{organisasi?.slug ?? '—'}</dd>
               </div>
               <div>
-                <dt className="text-xs text-tinta-400">Terdaftar sejak</dt>
+                <dt className="mono-label text-tinta-400">Terdaftar sejak</dt>
                 <dd className="mt-0.5 text-tinta-600">{formatTanggal(organisasi?.created_at)}</dd>
               </div>
               <div>
-                <dt className="text-xs text-tinta-400">Jumlah anggota</dt>
+                <dt className="mono-label text-tinta-400">Jumlah anggota</dt>
                 <dd className="mt-0.5 text-tinta-600">{anggota.length} pengguna</dd>
               </div>
             </dl>
           </IsiKartu>
 
           <div className="border-t border-beige-200">
-            <h3 className="px-5 pb-2 pt-4 text-sm font-semibold text-tinta-800">Anggota tim</h3>
+            <h3 className="mono-label px-5 pb-2 pt-4 text-tinta-400">Anggota tim</h3>
             <ul className="divide-y divide-beige-200">
               {anggota.map((orang) => (
                 <li
@@ -119,13 +123,13 @@ export default async function HalamanPengaturan() {
                   className="flex items-center justify-between gap-3 px-5 py-3 text-sm"
                 >
                   <div className="min-w-0">
-                    <p className="truncate font-medium text-tinta-800">
+                    <p className="truncate font-medium text-tinta-900">
                       {orang.nama}
                       {orang.id === profile.id ? (
                         <span className="ml-1.5 text-xs font-normal text-tinta-400">(Anda)</span>
                       ) : null}
                     </p>
-                    <p className="text-xs text-tinta-400">
+                    <p className="mono-label mt-1 text-tinta-400">
                       Bergabung {formatTanggal(orang.created_at)}
                     </p>
                   </div>
@@ -144,8 +148,11 @@ export default async function HalamanPengaturan() {
             <div className="flex items-start gap-2.5 border-t border-beige-200 bg-beige-100/50 px-5 py-3.5">
               <IkonInfo className="mt-0.5 h-4 w-4 shrink-0 text-kayu-600" />
               <p className="text-xs leading-relaxed text-tinta-500">
-                Pengelolaan role lewat antarmuka dijadwalkan pada Tahap 2. Untuk sekarang, ubah role
-                anggota melalui SQL Editor Supabase — setiap perubahan tetap tercatat di audit log.
+                Role dan status akun anggota kini bisa diatur di halaman{' '}
+                <Link href="/pengguna" className="font-medium text-matcha-700 underline underline-offset-2">
+                  Anggota Tim
+                </Link>
+                .
               </p>
             </div>
           ) : null}
@@ -164,7 +171,7 @@ export default async function HalamanPengaturan() {
             <ul className="divide-y divide-beige-200">
               {audit.map((baris) => (
                 <li key={baris.id} className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-5 py-3">
-                  <p className="text-sm text-tinta-800">
+                  <p className="text-sm text-tinta-900">
                     {LABEL_AKSI[baris.action] ?? baris.action}
                   </p>
                   <span className="text-xs text-tinta-500">
@@ -172,7 +179,7 @@ export default async function HalamanPengaturan() {
                   </span>
                   <time
                     dateTime={baris.created_at}
-                    className="ml-auto whitespace-nowrap text-xs text-tinta-400"
+                    className="mono-label ml-auto whitespace-nowrap text-tinta-300"
                   >
                     {formatTanggalWaktu(baris.created_at)}
                   </time>

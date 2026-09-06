@@ -1,28 +1,33 @@
 import type { Metadata, Viewport } from 'next';
-import { Cormorant_Garamond, Plus_Jakarta_Sans } from 'next/font/google';
+import { Inter, JetBrains_Mono } from 'next/font/google';
 
 import { PenyediaToast } from '@/components/ui/toast';
 import { APP_NAME, APP_TAGLINE } from '@/lib/constants';
 
 import './globals.css';
 
-const jakarta = Plus_Jakarta_Sans({
+/**
+ * Dua huruf saja, dipakai dengan disiplin.
+ *
+ * Inter memikul semuanya — dari angka setinggi 3rem sampai teks bantu 12px —
+ * dengan bobot 800 untuk judul dan angka. JetBrains Mono khusus untuk label
+ * teknis: header kolom, status, dan metadata.
+ *
+ * Serif sengaja dibuang. Serif dekoratif di atas tabel inventori membuat
+ * antarmuka terbaca seperti undangan, bukan alat kerja.
+ */
+const inter = Inter({
   subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
   display: 'swap',
-  variable: '--font-jakarta',
+  variable: '--font-inter',
 });
 
-/**
- * Serif bergaya mincho untuk judul: kontras tebal-tipis yang tinggi memberi
- * kesan kedai teh Jepang modern. Dipilih varian Latin karena seluruh UI
- * berbahasa Indonesia — font mincho asli membawa ribuan glif Jepang
- * (belasan MB) yang tidak pernah terpakai di sini.
- */
-const mincho = Cormorant_Garamond({
+const monoTeknis = JetBrains_Mono({
   subsets: ['latin'],
-  weight: ['500', '600', '700'],
+  weight: ['400', '500'],
   display: 'swap',
-  variable: '--font-mincho',
+  variable: '--font-mono-teknis',
 });
 
 export const metadata: Metadata = {
@@ -38,14 +43,14 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#3f5f2e',
+  themeColor: '#1e2e18',
   width: 'device-width',
   initialScale: 1,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id" className={`${jakarta.variable} ${mincho.variable}`}>
+    <html lang="id" className={`${inter.variable} ${monoTeknis.variable}`}>
       <body className="min-h-dvh antialiased">
         <PenyediaToast>{children}</PenyediaToast>
       </body>

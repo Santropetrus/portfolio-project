@@ -72,7 +72,7 @@ export function FilterInventori() {
           placeholder="Cari nama bahan atau supplier…"
           aria-label="Cari bahan baku"
           maxLength={80}
-          className="w-full rounded-xl border border-beige-300 bg-white/80 py-2.5 pl-9 pr-3 text-sm text-tinta-800 placeholder:text-tinta-400 focus:border-matcha-500 focus:outline-none focus:ring-2 focus:ring-matcha-500/25"
+          className="w-full rounded-[var(--radius-kartu)] border border-beige-300 bg-white/70 py-2.5 pl-9 pr-3 text-sm text-tinta-900 placeholder:text-tinta-300 focus:border-tinta-700 focus:outline-none"
         />
       </div>
 
@@ -81,7 +81,7 @@ export function FilterInventori() {
           value={kategoriTerpilih}
           onChange={(event) => perbaruiParam({ kategori: event.target.value })}
           aria-label="Filter kategori"
-          className="rounded-xl border border-beige-300 bg-white/80 px-3 py-2.5 text-sm text-tinta-700 focus:border-matcha-500 focus:outline-none focus:ring-2 focus:ring-matcha-500/25"
+          className="mono-label rounded-[var(--radius-kartu)] border border-beige-300 bg-white/70 px-3 py-2.5 text-tinta-600 focus:border-tinta-700 focus:outline-none"
         >
           <option value="">Semua kategori</option>
           {KATEGORI_INVENTORI.map((kategori) => (
@@ -95,7 +95,7 @@ export function FilterInventori() {
           value={statusTerpilih}
           onChange={(event) => perbaruiParam({ status: event.target.value })}
           aria-label="Filter status stok"
-          className="rounded-xl border border-beige-300 bg-white/80 px-3 py-2.5 text-sm text-tinta-700 focus:border-matcha-500 focus:outline-none focus:ring-2 focus:ring-matcha-500/25"
+          className="mono-label rounded-[var(--radius-kartu)] border border-beige-300 bg-white/70 px-3 py-2.5 text-tinta-600 focus:border-tinta-700 focus:outline-none"
         >
           <option value="">Semua status</option>
           {STATUS_STOK.map((status) => (

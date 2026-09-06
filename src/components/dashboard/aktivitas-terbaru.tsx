@@ -18,15 +18,9 @@ export interface BarisAktivitas {
 }
 
 const gayaTipe: Record<StockTransactionType, { kelas: string; Ikon: typeof IkonNaik }> = {
-  masuk: {
-    kelas: 'bg-[var(--color-status-aman-bg)] text-[var(--color-status-aman)]',
-    Ikon: IkonNaik,
-  },
-  keluar: {
-    kelas: 'bg-[var(--color-status-habis-bg)] text-[var(--color-status-habis)]',
-    Ikon: IkonTurun,
-  },
-  penyesuaian: { kelas: 'bg-kayu-100 text-kayu-700', Ikon: IkonSeimbang },
+  masuk: { kelas: 'text-[var(--color-status-aman)]', Ikon: IkonNaik },
+  keluar: { kelas: 'text-[var(--color-status-habis)]', Ikon: IkonTurun },
+  penyesuaian: { kelas: 'text-kayu-600', Ikon: IkonSeimbang },
 };
 
 export function DaftarAktivitas({ data }: { data: BarisAktivitas[] }) {
@@ -45,26 +39,27 @@ export function DaftarAktivitas({ data }: { data: BarisAktivitas[] }) {
         const { kelas, Ikon } = gayaTipe[baris.tipe];
         return (
           <li key={baris.id} className="flex items-start gap-3 px-5 py-3.5">
-            <span
-              className={cn('mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg', kelas)}
-            >
+            <span className={cn('mt-0.5 shrink-0', kelas)}>
               <Ikon className="h-4 w-4" />
             </span>
 
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                <p className="truncate text-sm font-medium text-tinta-800">{baris.namaBahan}</p>
+                <p className="truncate text-sm font-medium text-tinta-900">{baris.namaBahan}</p>
                 <BadgeNetral>{TIPE_TRANSAKSI[baris.tipe]}</BadgeNetral>
               </div>
-              <p className="mt-0.5 text-xs text-tinta-500">
-                {formatAngka(baris.stok_sebelum)} → {formatAngka(baris.stok_sesudah)} {baris.satuan}
+              <p className="mt-1 text-xs text-tinta-500">
+                <span className="angka-tabel">
+                  {formatAngka(baris.stok_sebelum)} → {formatAngka(baris.stok_sesudah)}
+                </span>{' '}
+                {baris.satuan}
                 {baris.catatan ? ` · ${baris.catatan}` : ''}
               </p>
             </div>
 
             <time
               dateTime={baris.created_at}
-              className="shrink-0 whitespace-nowrap pt-1 text-xs text-tinta-400"
+              className="mono-label shrink-0 whitespace-nowrap pt-1 text-tinta-300"
             >
               {waktuRelatif(baris.created_at)}
             </time>

@@ -5,11 +5,11 @@ import { forwardRef, useId, type InputHTMLAttributes, type ReactNode, type Selec
 import { cn } from '@/lib/utils';
 
 const gayaKontrol =
-  'w-full rounded-xl border border-beige-300 bg-white/80 px-3.5 py-2.5 text-sm text-tinta-800 ' +
-  'placeholder:text-tinta-400 transition-colors ' +
-  'hover:border-beige-400 focus:border-matcha-500 focus:bg-white focus:outline-none ' +
-  'focus:ring-2 focus:ring-matcha-500/25 disabled:cursor-not-allowed disabled:bg-beige-100/60 ' +
-  'aria-[invalid=true]:border-[var(--color-status-habis)] aria-[invalid=true]:ring-[var(--color-status-habis)]/20';
+  'w-full rounded-[var(--radius-kartu)] border border-beige-300 bg-white/70 px-3 py-2.5 ' +
+  'text-sm text-tinta-900 placeholder:text-tinta-300 transition-colors ' +
+  'hover:border-beige-400 focus:border-tinta-700 focus:bg-white focus:outline-none ' +
+  'disabled:cursor-not-allowed disabled:bg-beige-100/60 ' +
+  'aria-[invalid=true]:border-[var(--color-status-habis)]';
 
 interface PembungkusProps {
   label: string;
@@ -32,7 +32,7 @@ export function Bidang({
 }: PembungkusProps) {
   return (
     <div className={cn('space-y-1.5', className)}>
-      <label htmlFor={htmlFor} className="block text-sm font-medium text-tinta-700">
+      <label htmlFor={htmlFor} className="mono-label block text-tinta-500">
         {label}
         {wajib ? (
           <span className="ml-1 text-[var(--color-status-habis)]" aria-hidden="true">
@@ -86,7 +86,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     >
       <div className="relative">
         {awalan ? (
-          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-xs text-tinta-400">
+          <span className="mono-label pointer-events-none absolute inset-y-0 left-3 flex items-center text-tinta-400">
             {awalan}
           </span>
         ) : null}

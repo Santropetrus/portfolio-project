@@ -100,32 +100,32 @@ export function PanelInventori({ data, bolehKelola, adaFilterAktif }: PanelInven
           <li key={bahan.id} className="space-y-2.5 px-5 py-4">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="truncate font-medium text-tinta-800">{bahan.nama}</p>
-                <p className="mt-0.5 text-xs text-tinta-500">{labelKategori(bahan.kategori)}</p>
+                <p className="truncate font-medium text-tinta-900">{bahan.nama}</p>
+                <p className="mono-label mt-1 text-tinta-400">{labelKategori(bahan.kategori)}</p>
               </div>
               <BadgeStatusStok status={bahan.status_stok} />
             </div>
 
-            <dl className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
+            <dl className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-sm">
               <div>
-                <dt className="text-tinta-400">Stok saat ini</dt>
-                <dd className="font-medium text-tinta-700">
+                <dt className="mono-label text-tinta-400">Stok saat ini</dt>
+                <dd className="angka-tabel mt-0.5 font-semibold text-tinta-900">
                   {formatAngka(bahan.stok_saat_ini)} {bahan.satuan}
                 </dd>
               </div>
               <div>
-                <dt className="text-tinta-400">Stok minimum</dt>
-                <dd className="text-tinta-700">
+                <dt className="mono-label text-tinta-400">Stok minimum</dt>
+                <dd className="angka-tabel mt-0.5 text-tinta-600">
                   {formatAngka(bahan.stok_minimum)} {bahan.satuan}
                 </dd>
               </div>
               <div>
-                <dt className="text-tinta-400">Harga beli</dt>
-                <dd className="text-tinta-700">{formatRupiah(bahan.harga_beli)}</dd>
+                <dt className="mono-label text-tinta-400">Harga beli</dt>
+                <dd className="angka-tabel mt-0.5 text-tinta-600">{formatRupiah(bahan.harga_beli)}</dd>
               </div>
               <div>
-                <dt className="text-tinta-400">Supplier</dt>
-                <dd className="truncate text-tinta-700">{bahan.supplier ?? '—'}</dd>
+                <dt className="mono-label text-tinta-400">Supplier</dt>
+                <dd className="mt-0.5 truncate text-tinta-600">{bahan.supplier ?? '—'}</dd>
               </div>
             </dl>
 
@@ -154,15 +154,15 @@ export function PanelInventori({ data, bolehKelola, adaFilterAktif }: PanelInven
         <table className="w-full min-w-[52rem] border-collapse text-sm">
           <caption className="sr-only">Daftar bahan baku The Matcha Kyoto</caption>
           <thead>
-            <tr className="border-b border-beige-200 bg-beige-100/50 text-left text-xs uppercase tracking-wide text-tinta-500">
-              <th scope="col" className="px-5 py-3 font-medium">Bahan</th>
-              <th scope="col" className="px-4 py-3 font-medium">Kategori</th>
-              <th scope="col" className="px-4 py-3 text-right font-medium">Stok</th>
-              <th scope="col" className="px-4 py-3 text-right font-medium">Minimum</th>
-              <th scope="col" className="px-4 py-3 text-right font-medium">Harga beli</th>
-              <th scope="col" className="px-4 py-3 font-medium">Status</th>
+            <tr className="border-b border-beige-300 text-left text-tinta-400">
+              <th scope="col" className="mono-label px-5 py-3 font-medium">Bahan</th>
+              <th scope="col" className="mono-label px-4 py-3 font-medium">Kategori</th>
+              <th scope="col" className="mono-label px-4 py-3 text-right font-medium">Stok</th>
+              <th scope="col" className="mono-label px-4 py-3 text-right font-medium">Minimum</th>
+              <th scope="col" className="mono-label px-4 py-3 text-right font-medium">Harga</th>
+              <th scope="col" className="mono-label px-4 py-3 font-medium">Status</th>
               {bolehKelola ? (
-                <th scope="col" className="px-5 py-3 text-right font-medium">Aksi</th>
+                <th scope="col" className="mono-label px-5 py-3 text-right font-medium">Aksi</th>
               ) : null}
             </tr>
           </thead>
@@ -170,10 +170,10 @@ export function PanelInventori({ data, bolehKelola, adaFilterAktif }: PanelInven
             {data.map((bahan) => {
               const sisaHari = hariMenuju(bahan.tanggal_kedaluwarsa);
               return (
-                <tr key={bahan.id} className="transition-colors hover:bg-beige-100/40">
+                <tr key={bahan.id} className="transition-colors hover:bg-beige-100/50">
                   <td className="px-5 py-3.5">
-                    <p className="font-medium text-tinta-800">{bahan.nama}</p>
-                    <p className="mt-0.5 text-xs text-tinta-400">
+                    <p className="font-medium text-tinta-900">{bahan.nama}</p>
+                    <p className="mt-1 text-xs text-tinta-400">
                       {bahan.supplier ?? 'Tanpa supplier'}
                       {bahan.tanggal_kedaluwarsa
                         ? ` · kedaluwarsa ${formatTanggal(bahan.tanggal_kedaluwarsa)}`
@@ -183,21 +183,21 @@ export function PanelInventori({ data, bolehKelola, adaFilterAktif }: PanelInven
                   <td className="px-4 py-3.5">
                     <BadgeNetral>{labelKategori(bahan.kategori)}</BadgeNetral>
                   </td>
-                  <td className="px-4 py-3.5 text-right font-medium text-tinta-800 tabular-nums">
+                  <td className="angka-tabel px-4 py-3.5 text-right font-semibold text-tinta-900">
                     {formatAngka(bahan.stok_saat_ini)}{' '}
-                    <span className="text-xs font-normal text-tinta-400">{bahan.satuan}</span>
+                    <span className="mono-label font-normal text-tinta-300">{bahan.satuan}</span>
                   </td>
-                  <td className="px-4 py-3.5 text-right text-tinta-500 tabular-nums">
+                  <td className="angka-tabel px-4 py-3.5 text-right text-tinta-400">
                     {formatAngka(bahan.stok_minimum)}
                   </td>
-                  <td className="px-4 py-3.5 text-right text-tinta-600 tabular-nums">
+                  <td className="angka-tabel px-4 py-3.5 text-right text-tinta-600">
                     {formatRupiah(bahan.harga_beli)}
                   </td>
                   <td className="px-4 py-3.5">
                     <div className="flex flex-col items-start gap-1">
                       <BadgeStatusStok status={bahan.status_stok} />
                       {sisaHari !== null && sisaHari <= 30 ? (
-                        <span className="text-[0.7rem] text-kayu-600">
+                        <span className="mono-label text-kayu-600">
                           {sisaHari < 0 ? 'Sudah kedaluwarsa' : `${sisaHari} hari lagi`}
                         </span>
                       ) : null}
@@ -246,7 +246,7 @@ export function PanelInventori({ data, bolehKelola, adaFilterAktif }: PanelInven
         lebar="sm"
       >
         <div className="space-y-5">
-          <div className="flex items-start gap-3 rounded-xl bg-[var(--color-status-habis-bg)] px-4 py-3.5">
+          <div className="flex items-start gap-3 border border-[var(--color-status-habis)]/25 bg-[var(--color-status-habis-bg)] px-4 py-3.5">
             <IkonPeringatan className="mt-0.5 h-5 w-5 shrink-0 text-[var(--color-status-habis)]" />
             <div className="text-sm text-tinta-700">
               <p>

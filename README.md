@@ -10,7 +10,7 @@ Supabase (PostgreSQL + Auth + RLS) · React Hook Form + Zod**.
 
 ---
 
-## Status: Tahap 1 selesai
+## Status: Tahap 1 dan Tahap 2 selesai
 
 Yang sudah berjalan:
 
@@ -25,6 +25,10 @@ Yang sudah berjalan:
 | Riwayat stok | Jejak `masuk` / `keluar` / `penyesuaian`, append-only |
 | Pengaturan | Profil, info organisasi, daftar anggota, audit log (owner/admin) |
 | Seed | Data demo opsional 21 bahan baku |
+| **Anggota tim** *(Tahap 2)* | Owner mengatur role dan menonaktifkan akun lewat antarmuka |
+| **Opname bertahap** *(Tahap 2)* | Staff mengajukan draft, owner/admin menyetujui atau menolak |
+| **Stok masuk & keluar** *(Tahap 2)* | Penerimaan barang dan pemakaian bahan sebagai modul tersendiri |
+| **Desain** *(Tahap 2)* | Antarmuka digarap ulang: tipografi editorial, label mono, garis rambut |
 
 Repo ini juga memuat satu halaman publik terpisah dari aplikasi operasional:
 **Fluid Studio** di `/studio` — situs portofolio studio desain fiktif dengan
@@ -76,6 +80,23 @@ aman. Semuanya mudah dilonggarkan pada tahap berikutnya:
 3. **Pendaftaran mandiri dinonaktifkan.** Akun dibuat owner lewat dashboard
    Supabase. Aplikasi internal tidak butuh halaman daftar publik.
 
+### Siapa boleh apa
+
+| Aksi | Owner | Admin | Staff |
+| --- | :---: | :---: | :---: |
+| Melihat inventori, riwayat stok, stok opname | ✓ | ✓ | ✓ |
+| Tambah / ubah / hapus bahan baku | ✓ | ✓ | — |
+| Catat stok masuk & keluar | ✓ | ✓ | — |
+| Mengajukan hasil hitung stok opname | ✓ | ✓ | ✓ (jadi draft) |
+| Stok langsung disesuaikan saat mengajukan | ✓ | ✓ | — |
+| Menyetujui / menolak draft opname | ✓ | ✓ | — |
+| Melihat audit log | ✓ | ✓ | — |
+| Mengubah role & status anggota | ✓ | — | — |
+
+Setiap baris di tabel ini ditegakkan oleh policy RLS dan trigger di database,
+bukan hanya oleh tombol yang disembunyikan. `supabase/tests/tahap2_checks.sql`
+mengujinya satu per satu.
+
 ### Alur data satu permintaan
 
 ```
@@ -119,10 +140,12 @@ PostgreSQL
 │   ├── migrations/
 │   │   ├── 20260101000000_init_schema.sql        Enum, tabel, indeks, updated_at
 │   │   ├── 20260101000100_functions_triggers.sql Helper RLS, audit, RPC opname
-│   │   └── 20260101000200_rls_policies.sql       RLS + grant tabel
+│   │   ├── 20260101000200_rls_policies.sql       RLS + grant tabel
+│   │   └── 20260201000000_tahap2_alur_kerja.sql  Alur opname, pergerakan stok
 │   ├── seed.sql                   Data demo opsional (21 bahan baku)
 │   └── tests/
-│       └── rls_checks.sql         10 kelompok uji keamanan database
+│       ├── rls_checks.sql         10 kelompok uji keamanan database
+│       └── tahap2_checks.sql      Uji alur kerja Tahap 2
 │
 └── src/
     ├── proxy.ts                   CSP nonce, refresh sesi, proteksi rute
@@ -140,9 +163,11 @@ PostgreSQL
     │   │   ├── error.tsx          Kondisi error per halaman
     │   │   ├── dashboard/         Ringkasan, perlu perhatian, aktivitas
     │   │   ├── inventori/         Tabel, cari, filter, CRUD
-    │   │   ├── stok-opname/       Form opname + riwayat
+    │   │   ├── pergerakan/        Stok masuk & keluar (owner/admin)
+    │   │   ├── stok-opname/       Pengajuan + tinjauan draft
     │   │   ├── riwayat-stok/      Jejak perubahan stok
-    │   │   └── pengaturan/        Profil, organisasi, anggota, audit log
+    │   │   ├── pengguna/          Role & status anggota (owner)
+    │   │   └── pengaturan/        Profil, organisasi, audit log
     │   └── studio/                Fluid Studio — halaman publik terpisah (§12)
     │       ├── studio.css         Sistem desainnya sendiri
     │       └── komponen/          Kubus 3D, gulir halus, penggaris, dll.
@@ -154,7 +179,10 @@ PostgreSQL
     │   ├── dashboard/
     │   ├── inventori/
     │   ├── opname/
-    │   └── pengaturan/
+    │   ├── pergerakan/
+    │   ├── pengguna/
+    │   ├── pengaturan/
+    │   └── setup/                 Halaman "Supabase belum dikonfigurasi"
     │
     ├── lib/
     │   ├── env.ts                 Validasi environment variable (Zod)
@@ -262,8 +290,10 @@ Buka **SQL Editor** di dashboard Supabase, lalu jalankan berkas berikut
 1. `supabase/migrations/20260101000000_init_schema.sql`
 2. `supabase/migrations/20260101000100_functions_triggers.sql`
 3. `supabase/migrations/20260101000200_rls_policies.sql`
+4. `supabase/migrations/20260201000000_tahap2_alur_kerja.sql`
 
-Urutannya penting: policy pada berkas ke-3 memakai fungsi dari berkas ke-2.
+Urutannya penting: policy pada berkas ke-3 memakai fungsi dari berkas ke-2,
+dan berkas ke-4 mengubah policy serta fungsi yang dibuat sebelumnya.
 
 ### Cara B — Supabase CLI
 
@@ -442,10 +472,44 @@ Jalankan sebagai **owner**, lalu ulangi bagian yang relevan sebagai **staff**.
 - [ ] Menyimpan → muncul satu baris `penyesuaian` di `/riwayat-stok`.
 - [ ] Menyimpan → muncul entri di riwayat opname dengan catatan.
 
+### Stok masuk & keluar (Tahap 2)
+
+- [ ] Memilih bahan menampilkan stok sekarang; mengisi jumlah menampilkan
+      pratinjau stok setelahnya.
+- [ ] Stok masuk menambah stok dan muncul di `/riwayat-stok` sebagai `masuk`.
+- [ ] Mengisi harga beli pada stok masuk memperbarui harga bahan di `/inventori`.
+- [ ] Stok keluar mengurangi stok dan **tidak** mengubah harga beli.
+- [ ] Stok keluar melebihi persediaan ditolak, dan tombol simpan mati saat
+      pratinjau menunjukkan angka negatif.
+
+### Alur persetujuan stok opname (Tahap 2)
+
+- [ ] Sebagai **staff**: mengajukan opname menghasilkan draft; stok di
+      `/inventori` **tidak** berubah.
+- [ ] Sebagai **owner/admin**: draft muncul di "Menunggu tinjauan", dan menu
+      Stok Opname di sidebar menampilkan lencana jumlahnya.
+- [ ] Menyetujui draft mengubah stok dan menambah baris `penyesuaian` di
+      `/riwayat-stok`.
+- [ ] Menolak draft **tidak** mengubah stok, dan statusnya jadi Ditolak.
+- [ ] Draft yang sudah ditinjau tidak muncul lagi di antrean.
+- [ ] Sebagai **owner/admin**: mengajukan opname langsung disetujui dan stok
+      berubah saat itu juga.
+
+### Anggota tim (Tahap 2)
+
+- [ ] Menu Anggota Tim hanya terlihat oleh **owner**.
+- [ ] Membuka `/pengguna` sebagai admin atau staff dialihkan ke `/dashboard`.
+- [ ] Owner dapat mengubah role anggota lain; perubahannya langsung terlihat.
+- [ ] Tombol Ubah role dan Nonaktifkan **mati** pada baris owner sendiri.
+- [ ] Menonaktifkan anggota membuatnya langsung kehilangan akses saat memuat
+      ulang halaman.
+- [ ] Perubahan role muncul di Audit log pada `/pengaturan`.
+
 ### Peran staff
 
 - [ ] Staff **tidak** melihat tombol Tambah/Ubah/Hapus di `/inventori`.
-- [ ] Staff melihat pesan "Akses terbatas" di `/stok-opname`.
+- [ ] Staff **tidak** melihat menu Stok Masuk & Keluar maupun Anggota Tim.
+- [ ] Membuka `/pergerakan` sebagai staff dialihkan ke `/dashboard`.
 - [ ] Staff **tidak** melihat kartu Audit log di `/pengaturan`.
 - [ ] Staff tetap bisa membaca dashboard, inventori, dan riwayat stok.
 
@@ -454,6 +518,9 @@ Jalankan sebagai **owner**, lalu ulangi bagian yang relevan sebagai **staff**.
 - [ ] Jalankan `supabase/tests/rls_checks.sql` lewat psql; setiap blok
       bertanda "harus GAGAL" memang menghasilkan ERROR, dan setiap blok
       "harus 0" memang mengembalikan 0.
+- [ ] Jalankan `supabase/tests/tahap2_checks.sql` dengan cara yang sama —
+      menguji alur persetujuan opname, pergerakan stok, dan pengelolaan
+      anggota.
 
 ### Aksesibilitas dan responsif
 
@@ -553,6 +620,12 @@ bisa dihapus. `script-src` sudah memakai nonce + `strict-dynamic` tanpa
 perubahan role). Peristiwa login/logout ada di log bawaan Supabase Auth
 (Dashboard → Logs → Auth). Menyatukan keduanya masuk Tahap 2.
 
+**Staff kini punya satu jalur tulis.** Sejak Tahap 2 staff boleh membuat baris
+di `stock_opnames`, tetapi hanya berstatus `draft`, hanya atas namanya sendiri,
+dan hanya di organisasinya — ketiganya ditegakkan policy RLS. Draft tidak
+menyentuh stok sama sekali. Ini pelebaran permukaan tulis yang disengaja dan
+dibatasi; sebelumnya staff sepenuhnya baca-saja.
+
 **Belum ada 2FA dan belum ada kebijakan rotasi kata sandi.**
 Supabase mendukung MFA; belum diaktifkan di tahap ini.
 
@@ -567,60 +640,77 @@ end-to-end untuk UI masuk Tahap 2.
 
 ---
 
-## 11. Usulan Tahap 2 (belum diimplementasikan)
+## 11. Tahap 2 — tiga modul baru
 
-Diurutkan berdasarkan manfaat langsung untuk operasional The Matcha Kyoto.
+### A. Anggota tim (`/pengguna`, khusus owner)
 
-### A. Manajemen pengguna lewat antarmuka
-Halaman khusus owner untuk mengundang anggota, mengubah role, dan menonaktifkan
-akun — menggantikan langkah SQL manual. Aturan databasenya sudah ada; yang
-kurang hanya UI dan alur undangan.
+Owner mengubah role dan menonaktifkan akun anggota lewat antarmuka,
+menggantikan langkah SQL manual di Tahap 1.
 
-### B. Alur stok opname untuk staff
-Staff mencatat hasil hitungan sebagai **draf**, owner/admin meninjau lalu
-menyetujui. Stok baru berubah setelah disetujui. Ini membuka partisipasi staff
-tanpa memberi mereka kemampuan mengubah stok secara langsung.
+Aturan yang ditegakkan database, bukan UI:
 
-### C. Stok masuk dan keluar sebagai modul tersendiri
-Saat ini perubahan stok dilakukan lewat form edit inventori. Tahap 2 sebaiknya
-punya modul penerimaan barang (dengan nomor faktur dan harga aktual) serta
-pemakaian harian, sehingga harga beli rata-rata bisa dihitung.
+- Hanya owner yang boleh mengubah `role`, `organization_id`, atau `is_active`.
+- Owner tidak dapat mengubah role akunnya sendiri (mencegah terkunci sendiri).
+- Organisasi harus selalu punya minimal satu owner aktif.
+- Setiap perubahan tercatat di audit log sebagai `profile.update_sensitive`.
 
-### D. Laporan dan analitik
-- Grafik pemakaian bahan per minggu/bulan
-- Estimasi hari sampai stok habis berdasarkan laju pemakaian
-- Nilai persediaan dari waktu ke waktu
-- Ekspor CSV/Excel untuk pembukuan
+Menonaktifkan akun tidak menghapusnya. Fungsi helper RLS mengembalikan `NULL`
+untuk profil nonaktif, sehingga seluruh policy gagal dan akses hilang seketika,
+sementara jejak aktivitasnya tetap utuh.
 
-### E. Peringatan otomatis
-Notifikasi saat stok menyentuh batas minimum atau saat tanggal kedaluwarsa
-mendekat, lewat email atau WhatsApp. Bisa dijalankan dengan Supabase Edge
-Function + cron.
+**Menambah anggota baru** masih lewat dashboard Supabase (Authentication →
+Users → Add user). Akun baru otomatis berrole staff, lalu rolenya diatur di
+halaman ini. Membuat akun dari aplikasi memerlukan service role key, dan kunci
+itu sengaja tidak pernah dibawa aplikasi ini agar tidak punya jalur ke browser.
 
-### F. Modul supplier
-Supplier saat ini hanya kolom teks. Jadikan tabel tersendiri dengan kontak,
-riwayat harga, lead time, dan perbandingan harga antar supplier.
+### B. Stok opname bertahap (`/stok-opname`)
 
-### G. Modul strategi bisnis
-Sesuai visi produk: target penjualan, margin per menu, kalkulator HPP yang
-menarik harga bahan langsung dari inventori, dan pencatatan eksperimen menu.
+Kolom `status` pada `stock_opnames` bernilai `draft`, `disetujui`, atau
+`ditolak`.
 
-### H. Modul pemasaran
-Kalender konten, pencatatan kampanye beserta biayanya, dan hubungannya dengan
-lonjakan pemakaian bahan.
+| Yang mengajukan | Hasil | Stok |
+| --- | --- | --- |
+| Staff | `draft` | Tidak berubah |
+| Owner / admin | `disetujui` | Langsung disesuaikan |
 
-### I. Penguatan keamanan
-- Rate limiting terdistribusi (Upstash Redis / Vercel KV)
-- MFA/2FA lewat Supabase Auth
-- Login dan logout masuk ke `audit_logs` aplikasi
-- Halaman audit log dengan filter dan ekspor
-- Soft delete untuk bahan baku
+Owner/admin menyetujui atau menolak draft. Menyetujui menyesuaikan stok dan
+menulis transaksi `penyesuaian`; menolak tidak mengubah apa pun. Hasil tinjauan
+bersifat final — tidak ada policy yang mengizinkan baris non-draft diubah lagi.
 
-### J. Kualitas dan operasional
-- Unit test untuk skema Zod dan helper
-- Test end-to-end (Playwright) untuk alur login, CRUD, dan opname
-- CI: typecheck, lint, build, dan `rls_checks.sql` pada database sementara
-- Mode offline/PWA untuk stok opname di gudang dengan sinyal lemah
+Dua detail yang mudah terlewat:
+
+- **Stok "sebelum" dibaca ulang saat persetujuan**, bukan diambil dari angka
+  waktu draft dibuat. Stok bisa berubah di antara pengajuan dan persetujuan;
+  riwayat harus mencerminkan perubahan yang benar-benar terjadi. Kolom
+  `stok_sistem` dibiarkan apa adanya sebagai catatan historis — itulah angka
+  yang dilihat penghitung.
+- **Persetujuan mengunci barisnya.** Bila dua manajer menekan setujui
+  bersamaan, hanya satu yang mendapat baris itu. Tanpa kunci, keduanya lolos
+  pemeriksaan status dan penyesuaian stok diterapkan dua kali.
+
+### C. Stok masuk & keluar (`/pergerakan`, owner/admin)
+
+Sebelumnya satu-satunya cara mengubah stok adalah form edit inventori, yang
+mencampur dua hal berbeda: memperbaiki data salah ketik, dan mencatat kejadian
+nyata. Modul ini memisahkannya.
+
+- **Stok masuk** — penerimaan barang. Bila harga beli diisi, harga bahan ikut
+  diperbarui.
+- **Stok keluar** — pemakaian, kerusakan, kehilangan. Tidak pernah mengubah
+  harga beli, dan ditolak bila melebihi persediaan.
+
+Keduanya berjalan lewat `catat_pergerakan_stok()` yang mengunci baris bahan,
+sehingga dua pencatatan bersamaan tidak saling menimpa.
+
+### Tampilan
+
+Antarmukanya digarap ulang mengikuti bahasa visual halaman Fluid Studio: garis
+rambut sebagai pemisah alih-alih tumpukan kartu bergradasi, label mono untuk
+seluruh metadata dan header kolom, angka besar dengan digit tabular sebagai
+konten utama, serta butiran film tipis di atas seluruh halaman. Serif dekoratif
+dibuang — di atas tabel inventori ia membuat antarmuka terbaca seperti undangan
+alih-alih alat kerja. Tiga aturan yang menjaganya tetap konsisten ada di komentar
+kepala `src/app/globals.css`.
 
 ---
 
@@ -677,3 +767,41 @@ alamat surel di dalamnya fiktif.
 - Kubus memakai CSS 3D, bukan WebGL. Cukup untuk satu volume; pemandangan yang
   lebih rumit (banyak objek, pencahayaan, bayangan) akan membutuhkan Three.js.
 
+
+---
+
+## 13. Usulan Tahap 3 (belum diimplementasikan)
+
+### A. Laporan dan analitik
+Grafik pemakaian per minggu, estimasi hari sampai stok habis berdasarkan laju
+pemakaian, nilai persediaan dari waktu ke waktu, dan ekspor CSV untuk pembukuan.
+Data mentahnya sudah lengkap di `stock_transactions`.
+
+### B. Peringatan otomatis
+Notifikasi saat stok menyentuh batas minimum atau tanggal kedaluwarsa mendekat,
+lewat email atau WhatsApp. Bisa dijalankan dengan Supabase Edge Function + cron.
+
+### C. Modul supplier
+Supplier masih berupa kolom teks. Jadikan tabel tersendiri dengan kontak,
+riwayat harga, lead time, dan perbandingan harga antar supplier.
+
+### D. Strategi bisnis
+Target penjualan, margin per menu, dan kalkulator HPP yang menarik harga bahan
+langsung dari inventori.
+
+### E. Pemasaran
+Kalender konten, pencatatan kampanye beserta biayanya, dan hubungannya dengan
+lonjakan pemakaian bahan.
+
+### F. Penguatan keamanan
+- Rate limiting terdistribusi (Upstash Redis / Vercel KV)
+- MFA/2FA lewat Supabase Auth
+- Login dan logout masuk ke `audit_logs` aplikasi
+- Halaman audit log dengan filter dan ekspor
+- Soft delete untuk bahan baku
+
+### G. Kualitas dan operasional
+- Unit test untuk skema Zod dan helper
+- Test end-to-end (Playwright) untuk alur login, CRUD, opname, dan pergerakan
+- CI: typecheck, lint, build, plus kedua skrip uji SQL pada database sementara
+- Mode offline/PWA untuk stok opname di gudang dengan sinyal lemah

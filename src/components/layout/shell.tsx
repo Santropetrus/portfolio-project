@@ -12,10 +12,12 @@ import { Sidebar } from './sidebar';
 export function KerangkaAplikasi({
   profile,
   namaOrganisasi,
+  jumlahOpnameMenunggu = 0,
   children,
 }: {
   profile: Profile;
   namaOrganisasi: string;
+  jumlahOpnameMenunggu?: number;
   children: ReactNode;
 }) {
   const pathname = usePathname();
@@ -42,10 +44,20 @@ export function KerangkaAplikasi({
   }, [drawerTerbuka]);
 
   return (
-    <div className="min-h-dvh lg:grid lg:grid-cols-[16rem_1fr]">
+    <div className="min-h-dvh lg:grid lg:grid-cols-[15rem_1fr]">
+      {/* Butiran film tipis di atas segalanya: menghilangkan kesan "flat
+          vector" dan menyatukan warna-warna datar menjadi satu permukaan. */}
+      <div
+        aria-hidden="true"
+        className="butiran-halaman pointer-events-none fixed inset-0 z-[60] opacity-40 mix-blend-multiply"
+      />
       {/* Sidebar desktop */}
       <aside className="sticky top-0 hidden h-dvh lg:block">
-        <Sidebar profile={profile} namaOrganisasi={namaOrganisasi} />
+        <Sidebar
+          profile={profile}
+          namaOrganisasi={namaOrganisasi}
+          jumlahOpnameMenunggu={jumlahOpnameMenunggu}
+        />
       </aside>
 
       {/* Drawer mobile */}
@@ -73,6 +85,7 @@ export function KerangkaAplikasi({
             <Sidebar
               profile={profile}
               namaOrganisasi={namaOrganisasi}
+              jumlahOpnameMenunggu={jumlahOpnameMenunggu}
               onNavigasi={() => setDrawerTerbuka(false)}
             />
           </div>
@@ -86,13 +99,13 @@ export function KerangkaAplikasi({
             type="button"
             onClick={() => setDrawerTerbuka(true)}
             aria-label="Buka menu navigasi"
-            className="rounded-lg border border-beige-300 bg-white/70 p-2 text-tinta-700 transition-colors hover:bg-beige-100"
+            className="border border-beige-300 p-2 text-tinta-700 transition-colors hover:bg-beige-100"
           >
             <IkonMenu className="h-5 w-5" />
           </button>
           <div className="flex min-w-0 flex-1 items-center gap-2">
             <LogoMatcha className="h-7 w-7 shrink-0" />
-            <span className="truncate font-serif text-sm text-tinta-900">
+            <span className="mono-label truncate text-tinta-700">
               {halaman?.label ?? 'The Matcha Kyoto Ops'}
             </span>
           </div>
@@ -106,23 +119,36 @@ export function KerangkaAplikasi({
   );
 }
 
+/**
+ * Header halaman.
+ *
+ * Judul besar dan rapat, label seksi mono di atasnya, lalu satu garis rambut
+ * penuh lebar. Pola ini berulang di setiap halaman sehingga aplikasi terbaca
+ * seperti satu terbitan, bukan kumpulan layar yang kebetulan sewarna.
+ */
 export function JudulHalaman({
+  label,
   judul,
   deskripsi,
   aksi,
 }: {
+  label: string;
   judul: string;
   deskripsi?: string;
   aksi?: ReactNode;
 }) {
   return (
-    <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-      <div className="min-w-0 space-y-1.5">
-        <h1 className="font-serif text-2xl text-tinta-900 sm:text-[1.75rem]">{judul}</h1>
-        <div className="garis-kuas h-px w-14 opacity-70" aria-hidden="true" />
-        {deskripsi ? <p className="text-sm text-tinta-500">{deskripsi}</p> : null}
+    <header className="mb-7 border-b border-beige-300 pb-5">
+      <p className="mono-label mb-3 text-tinta-400">( {label} )</p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="min-w-0 space-y-2">
+          <h1 className="angka-besar text-[1.9rem] text-tinta-900 sm:text-[2.5rem]">{judul}</h1>
+          {deskripsi ? (
+            <p className="max-w-2xl text-sm leading-relaxed text-tinta-500">{deskripsi}</p>
+          ) : null}
+        </div>
+        {aksi ? <div className="flex shrink-0 items-center gap-2">{aksi}</div> : null}
       </div>
-      {aksi ? <div className="flex shrink-0 items-center gap-2">{aksi}</div> : null}
-    </div>
+    </header>
   );
 }

@@ -156,3 +156,31 @@ export const IkonSeimbang = (p: IconProps) => (
     <path d="M4 9h16M4 15h16" />
   </Base>
 );
+
+export const IkonPengguna = (p: IconProps) => (
+  <Base {...p}>
+    <circle cx="12" cy="8" r="3.6" />
+    <path d="M4.5 20a7.5 7.5 0 0 1 15 0" />
+  </Base>
+);
+
+export const IkonSetujui = (p: IconProps) => (
+  <Base {...p}>
+    <circle cx="12" cy="12" r="8.5" />
+    <path d="m8.5 12.3 2.5 2.5 4.5-5" />
+  </Base>
+);
+
+export const IkonTolak = (p: IconProps) => (
+  <Base {...p}>
+    <circle cx="12" cy="12" r="8.5" />
+    <path d="m9 9 6 6M15 9l-6 6" />
+  </Base>
+);
+
+export const IkonJam = (p: IconProps) => (
+  <Base {...p}>
+    <circle cx="12" cy="12" r="8.5" />
+    <path d="M12 7.5V12l3 1.8" />
+  </Base>
+);

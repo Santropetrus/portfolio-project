@@ -17,7 +17,7 @@ import {
   type MasukanStokOpname,
   type NilaiStokOpname,
 } from '@/lib/validation/opname';
-import { aksiCatatOpname } from '@/server/actions/opname';
+import { aksiAjukanOpname } from '@/server/actions/opname';
 
 export interface BahanUntukOpname {
   id: string;
@@ -27,7 +27,14 @@ export interface BahanUntukOpname {
   stok_saat_ini: number;
 }
 
-export function FormOpname({ daftarBahan }: { daftarBahan: BahanUntukOpname[] }) {
+export function FormOpname({
+  daftarBahan,
+  bolehLangsungSetujui,
+}: {
+  daftarBahan: BahanUntukOpname[];
+  /** Owner/admin: hasilnya langsung disetujui. Staff: tersimpan sebagai draft. */
+  bolehLangsungSetujui: boolean;
+}) {
   const router = useRouter();
   const { tampilkan } = useToast();
   const [pending, startTransition] = useTransition();
@@ -64,12 +71,15 @@ export function FormOpname({ daftarBahan }: { daftarBahan: BahanUntukOpname[] })
 
   const kirim = handleSubmit((nilai) => {
     startTransition(async () => {
-      const hasil = await aksiCatatOpname(nilai);
+      const hasil = await aksiAjukanOpname(nilai);
 
       if (!hasil.sukses) {
         for (const [field, pesan] of Object.entries(hasil.errorField ?? {})) {
           if (field in nilai) {
-            setError(field as keyof MasukanStokOpname, { type: 'server', message: pesan });
+            setError(field as keyof MasukanStokOpname, {
+              type: 'server',
+              message: String(pesan),
+            });
           }
         }
         tampilkan({ tipe: 'gagal', judul: 'Gagal menyimpan opname', deskripsi: hasil.pesan });
@@ -109,12 +119,12 @@ export function FormOpname({ daftarBahan }: { daftarBahan: BahanUntukOpname[] })
       </Select>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className="rounded-xl border border-beige-200 bg-beige-100/50 px-4 py-3">
-          <p className="text-xs font-medium uppercase tracking-wide text-tinta-400">Stok sistem</p>
-          <p className="mt-1.5 font-serif text-2xl text-tinta-900">
+        <div className="border border-beige-300 bg-beige-100/40 px-4 py-3">
+          <p className="mono-label text-tinta-400">Stok sistem</p>
+          <p className="angka-besar mt-2 text-2xl text-tinta-900">
             {bahanTerpilih ? formatAngka(bahanTerpilih.stok_saat_ini) : '—'}
             {bahanTerpilih ? (
-              <span className="ml-1.5 font-sans text-sm font-normal text-tinta-400">
+              <span className="mono-label ml-1.5 font-normal text-tinta-400">
                 {bahanTerpilih.satuan}
               </span>
             ) : null}
@@ -146,9 +156,16 @@ export function FormOpname({ daftarBahan }: { daftarBahan: BahanUntukOpname[] })
         {...register('catatan')}
       />
 
+      {!bolehLangsungSetujui ? (
+        <p className="mono-label text-tinta-400">
+          Hasil hitungan Anda tersimpan sebagai draft. Stok baru berubah setelah owner atau admin
+          menyetujuinya.
+        </p>
+      ) : null}
+
       {terakhirDisimpan ? (
-        <p className="text-xs text-[var(--color-status-aman)]">
-          Opname terakhir tersimpan untuk “{terakhirDisimpan}”.
+        <p className="mono-label text-[var(--color-status-aman)]">
+          Tersimpan untuk {terakhirDisimpan}
         </p>
       ) : null}
 
@@ -165,7 +182,7 @@ export function FormOpname({ daftarBahan }: { daftarBahan: BahanUntukOpname[] })
           Bersihkan
         </Button>
         <Button type="submit" sedangMemuat={pending} disabled={!bahanTerpilih}>
-          Simpan stok opname
+          {bolehLangsungSetujui ? 'Simpan & sesuaikan stok' : 'Ajukan untuk ditinjau'}
         </Button>
       </div>
     </form>
@@ -208,12 +225,12 @@ function PratinjauSelisih({ selisih, satuan }: { selisih: number | null; satuan:
   return (
     <div
       aria-live="polite"
-      className={cn('flex items-start gap-3 rounded-xl border px-4 py-3.5', kelas)}
+      className={cn('flex items-start gap-3 border px-4 py-3.5', kelas)}
     >
       <Ikon className="mt-0.5 h-5 w-5 shrink-0" />
       <div>
-        <p className="text-sm font-semibold">{judul}</p>
-        <p className="mt-0.5 text-xs opacity-85">{deskripsi}</p>
+        <p className="mono-label">{judul}</p>
+        <p className="mt-1 text-[0.8rem] leading-relaxed opacity-85">{deskripsi}</p>
       </div>
     </div>
   );

@@ -84,15 +84,15 @@ export function PenyediaToast({ children }: { children: ReactNode }) {
             role="status"
             aria-live="polite"
             className={cn(
-              'animasi-geser pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-xl border px-4 py-3 shadow-[var(--shadow-angkat)]',
+              'animasi-geser pointer-events-auto flex w-full max-w-sm items-start gap-3 border px-4 py-3 shadow-[var(--shadow-angkat)]',
               gaya[toast.tipe].wadah,
             )}
           >
             <span className="mt-0.5 shrink-0">{gaya[toast.tipe].ikon}</span>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold">{toast.judul}</p>
+              <p className="mono-label">{toast.judul}</p>
               {toast.deskripsi ? (
-                <p className="mt-0.5 text-xs opacity-90">{toast.deskripsi}</p>
+                <p className="mt-1 text-[0.8rem] leading-relaxed opacity-90">{toast.deskripsi}</p>
               ) : null}
             </div>
             <button

@@ -62,10 +62,11 @@ export default async function HalamanInventori({
   return (
     <>
       <JudulHalaman
-        judul="Inventori"
+        label="Inventori"
+        judul="Bahan baku"
         deskripsi={
           bolehKelola
-            ? 'Kelola seluruh bahan baku The Matcha Kyoto.'
+            ? 'Seluruh bahan baku The Matcha Kyoto. Untuk mencatat barang datang atau bahan terpakai, gunakan halaman Stok Masuk & Keluar.'
             : 'Daftar bahan baku. Sebagai staff, Anda memiliki akses baca saja.'
         }
       />

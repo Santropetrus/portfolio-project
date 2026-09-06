@@ -108,14 +108,13 @@ export function Dialog({
         aria-describedby={deskripsi ? 'deskripsi-dialog' : undefined}
         className={cn(
           'animasi-muncul relative flex max-h-[92vh] w-full flex-col overflow-hidden',
-          'rounded-t-[1.5rem] border border-beige-200 bg-gading-50 shadow-[var(--shadow-angkat)]',
-          'sm:rounded-[1.25rem]',
+          'border border-beige-300 bg-gading-50 shadow-[var(--shadow-angkat)]',
           gayaLebar[lebar],
         )}
       >
-        <header className="flex items-start justify-between gap-4 border-b border-beige-200 bg-white/60 px-5 py-4">
+        <header className="flex items-start justify-between gap-4 border-b border-beige-200 px-5 py-4">
           <div className="min-w-0">
-            <h2 id="judul-dialog" className="text-lg font-semibold text-tinta-900">
+            <h2 id="judul-dialog" className="text-lg font-bold tracking-tight text-tinta-900">
               {judul}
             </h2>
             {deskripsi ? (

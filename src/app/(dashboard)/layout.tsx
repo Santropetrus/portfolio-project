@@ -1,6 +1,6 @@
 import { KerangkaAplikasi } from '@/components/layout/shell';
 import { PerluKonfigurasi } from '@/components/setup/perlu-konfigurasi';
-import { wajibSesi } from '@/lib/auth/session';
+import { apakahManajer, wajibSesi } from '@/lib/auth/session';
 import { isSupabaseConfigured } from '@/lib/env';
 
 /**
@@ -19,14 +19,28 @@ export default async function LayoutDashboard({ children }: { children: React.Re
 
   const { profile, supabase } = await wajibSesi();
 
-  const { data: organisasi } = await supabase
-    .from('organizations')
-    .select('nama')
-    .eq('id', profile.organization_id)
-    .maybeSingle<{ nama: string }>();
+  const [hasilOrganisasi, hasilDraft] = await Promise.all([
+    supabase
+      .from('organizations')
+      .select('nama')
+      .eq('id', profile.organization_id)
+      .maybeSingle<{ nama: string }>(),
+    // Lencana pada menu Stok Opname. Hanya relevan untuk yang boleh meninjau,
+    // jadi staff tidak perlu query tambahan.
+    apakahManajer(profile.role)
+      ? supabase
+          .from('stock_opnames')
+          .select('id', { count: 'exact', head: true })
+          .eq('status', 'draft')
+      : Promise.resolve({ count: 0 }),
+  ]);
 
   return (
-    <KerangkaAplikasi profile={profile} namaOrganisasi={organisasi?.nama ?? 'The Matcha Kyoto'}>
+    <KerangkaAplikasi
+      profile={profile}
+      namaOrganisasi={hasilOrganisasi.data?.nama ?? 'The Matcha Kyoto'}
+      jumlahOpnameMenunggu={hasilDraft.count ?? 0}
+    >
       {children}
     </KerangkaAplikasi>
   );

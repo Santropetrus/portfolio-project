@@ -29,7 +29,7 @@ export function Paginasi({
       aria-label="Navigasi halaman"
       className="flex flex-wrap items-center justify-between gap-3 border-t border-beige-200 px-5 py-3.5"
     >
-      <p className="text-xs text-tinta-500">
+      <p className="mono-label text-tinta-400">
         Halaman {halaman} dari {totalHalaman} · {total} bahan
       </p>
       <div className="flex gap-2">

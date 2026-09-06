@@ -18,3 +18,14 @@ export const nilaiAwalStokOpname: MasukanStokOpname = {
   stok_fisik: '',
   catatan: '',
 };
+
+/** Keputusan owner/admin atas sebuah draft stok opname. */
+export const skemaTinjauOpname = z
+  .object({
+    opname_id: uuidWajib('Data stok opname'),
+    setujui: z.boolean({ error: 'Keputusan wajib diisi.' }),
+    catatan_peninjau: teksOpsional(1000, 'Catatan peninjau'),
+  })
+  .strict();
+
+export type NilaiTinjauOpname = z.output<typeof skemaTinjauOpname>;

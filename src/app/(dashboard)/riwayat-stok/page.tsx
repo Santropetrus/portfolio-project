@@ -27,15 +27,9 @@ interface BarisRiwayat {
 }
 
 const gayaTipe: Record<StockTransactionType, { kelas: string; Ikon: typeof IkonNaik }> = {
-  masuk: {
-    kelas: 'bg-[var(--color-status-aman-bg)] text-[var(--color-status-aman)]',
-    Ikon: IkonNaik,
-  },
-  keluar: {
-    kelas: 'bg-[var(--color-status-habis-bg)] text-[var(--color-status-habis)]',
-    Ikon: IkonTurun,
-  },
-  penyesuaian: { kelas: 'bg-kayu-100 text-kayu-700', Ikon: IkonSeimbang },
+  masuk: { kelas: 'text-[var(--color-status-aman)]', Ikon: IkonNaik },
+  keluar: { kelas: 'text-[var(--color-status-habis)]', Ikon: IkonTurun },
+  penyesuaian: { kelas: 'text-kayu-600', Ikon: IkonSeimbang },
 };
 
 export default async function HalamanRiwayatStok({
@@ -64,8 +58,9 @@ export default async function HalamanRiwayatStok({
   return (
     <>
       <JudulHalaman
-        judul="Riwayat Stok"
-        deskripsi="Seluruh perubahan stok tercatat otomatis dan tidak dapat diubah maupun dihapus."
+        label="Riwayat stok"
+        judul="Jejak perubahan"
+        deskripsi="Seluruh perubahan stok tercatat otomatis oleh database dan tidak dapat diubah maupun dihapus dari aplikasi."
       />
 
       <Kartu>
@@ -84,29 +79,24 @@ export default async function HalamanRiwayatStok({
                 const satuan = baris.inventory_items?.satuan ?? '';
                 return (
                   <li key={baris.id} className="flex items-start gap-3.5 px-5 py-4">
-                    <span
-                      className={cn(
-                        'mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl',
-                        kelas,
-                      )}
-                    >
+                    <span className={cn('mt-1 shrink-0', kelas)}>
                       <Ikon className="h-4 w-4" />
                     </span>
 
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                        <p className="truncate text-sm font-medium text-tinta-800">
+                        <p className="truncate text-sm font-medium text-tinta-900">
                           {baris.inventory_items?.nama ?? 'Bahan sudah dihapus'}
                         </p>
                         <BadgeNetral>{TIPE_TRANSAKSI[baris.tipe]}</BadgeNetral>
                       </div>
 
-                      <p className="mt-1 text-sm text-tinta-600 tabular-nums">
+                      <p className="angka-tabel mt-1.5 text-sm text-tinta-600">
                         {formatAngka(baris.stok_sebelum)} {satuan} →{' '}
-                        <strong className="font-semibold text-tinta-800">
+                        <strong className="font-semibold text-tinta-900">
                           {formatAngka(baris.stok_sesudah)} {satuan}
                         </strong>
-                        <span className="ml-2 text-xs text-tinta-400">
+                        <span className="ml-2 text-xs text-tinta-300">
                           ({baris.tipe === 'keluar' ? '−' : '+'}
                           {formatAngka(baris.jumlah)})
                         </span>
@@ -119,7 +109,7 @@ export default async function HalamanRiwayatStok({
 
                     <time
                       dateTime={baris.created_at}
-                      className="shrink-0 whitespace-nowrap pt-1 text-xs text-tinta-400"
+                      className="mono-label shrink-0 whitespace-nowrap pt-1.5 text-tinta-300"
                     >
                       {formatTanggalWaktu(baris.created_at)}
                     </time>

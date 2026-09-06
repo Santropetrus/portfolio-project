@@ -1,4 +1,10 @@
-import type { InventoryCategory, StockStatus, StockTransactionType, UserRole } from '@/types/database';
+import type {
+  InventoryCategory,
+  OpnameStatus,
+  StockStatus,
+  StockTransactionType,
+  UserRole,
+} from '@/types/database';
 
 export const APP_NAME = 'The Matcha Kyoto Ops';
 export const APP_TAGLINE = 'Kelola stok, strategi, dan pertumbuhan bisnis dalam satu tempat.';
@@ -71,3 +77,22 @@ export const SARAN_SATUAN = [
 ] as const;
 
 export const UKURAN_HALAMAN = 20;
+
+export const LABEL_STATUS_OPNAME: Record<OpnameStatus, string> = {
+  draft: 'Menunggu tinjauan',
+  disetujui: 'Disetujui',
+  ditolak: 'Ditolak',
+};
+
+export const TIPE_PERGERAKAN = [
+  {
+    value: 'masuk' as const,
+    label: 'Stok masuk',
+    deskripsi: 'Penerimaan barang dari supplier atau hasil produksi internal.',
+  },
+  {
+    value: 'keluar' as const,
+    label: 'Stok keluar',
+    deskripsi: 'Pemakaian harian, bahan rusak, atau kehilangan.',
+  },
+] as const;
