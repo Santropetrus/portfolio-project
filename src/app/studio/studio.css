@@ -609,9 +609,16 @@ body:has(.studio) {
   will-change: transform;
 }
 
+/*
+ * Setiap sisi sedikit dibesarkan (scale 1.012) agar tepinya saling menindih.
+ * Tanpa itu, pembulatan subpiksel meninggalkan celah setipis rambut di
+ * pertemuan dua bidang, dan latar halaman menyembul sebagai garis bergerigi.
+ * `background-color` gelap menjadi jaring pengaman untuk sisa celah apa pun.
+ */
 .kubus__sisi {
   position: absolute;
   inset: 0;
+  background-color: #0a1114;
   background-size: cover;
   background-position: center;
   backface-visibility: hidden;
@@ -619,22 +626,22 @@ body:has(.studio) {
 }
 
 .kubus__sisi--depan {
-  transform: translateZ(calc(var(--sisi) / 2));
+  transform: translateZ(calc(var(--sisi) / 2)) scale(1.012);
 }
 .kubus__sisi--belakang {
-  transform: rotateY(180deg) translateZ(calc(var(--sisi) / 2));
+  transform: rotateY(180deg) translateZ(calc(var(--sisi) / 2)) scale(1.012);
 }
 .kubus__sisi--kanan {
-  transform: rotateY(90deg) translateZ(calc(var(--sisi) / 2));
+  transform: rotateY(90deg) translateZ(calc(var(--sisi) / 2)) scale(1.012);
 }
 .kubus__sisi--kiri {
-  transform: rotateY(-90deg) translateZ(calc(var(--sisi) / 2));
+  transform: rotateY(-90deg) translateZ(calc(var(--sisi) / 2)) scale(1.012);
 }
 .kubus__sisi--atas {
-  transform: rotateX(90deg) translateZ(calc(var(--sisi) / 2));
+  transform: rotateX(90deg) translateZ(calc(var(--sisi) / 2)) scale(1.012);
 }
 .kubus__sisi--bawah {
-  transform: rotateX(-90deg) translateZ(calc(var(--sisi) / 2));
+  transform: rotateX(-90deg) translateZ(calc(var(--sisi) / 2)) scale(1.012);
 }
 
 .seksi-kubus__kaki {

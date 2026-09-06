@@ -138,8 +138,11 @@ const berkas = {
   'kubus-2.svg': tekstur({ frekuensi: '0.006 0.011', oktaf: 8, benih: 27, gelap: TINTA_GELAP, terang: TINTA_TERANG, profil: 'marmer', buram: 0.7 }),
   'kubus-3.svg': tekstur({ frekuensi: '0.0035 0.02', oktaf: 6, benih: 44, gelap: LAUT_GELAP, terang: LAUT_TERANG, profil: 'ombak', buram: 0.5 }),
   'kubus-4.svg': tekstur({ frekuensi: '0.0032 0.008', oktaf: 6, benih: 63, gelap: TINTA_GELAP, terang: TINTA_TERANG, profil: 'marmer', buram: 0.8 }),
-  'kubus-5.svg': tekstur({ frekuensi: '0.0018 0.035', oktaf: 7, benih: 82, gelap: LAUT_GELAP, terang: LAUT_TERANG, profil: 'ombak', buram: 0.35 }),
-  'kubus-6.svg': tekstur({ frekuensi: '0.0028 0.016', oktaf: 7, benih: 96, gelap: LAUT_GELAP, terang: LAUT_TERANG, profil: 'ombak', buram: 0.55 }),
+  // Sisi atas dan bawah selalu terlihat sangat miring, jadi teksturnya dibuat
+  // berfrekuensi rendah dan lebih kabur. Pola bergaris rapat akan beraliasing
+  // menjadi pita keras begitu bidangnya diperpendek oleh perspektif.
+  'kubus-5.svg': tekstur({ frekuensi: '0.0035 0.0055', oktaf: 5, benih: 82, gelap: LAUT_GELAP, terang: LAUT_TERANG, profil: 'asap', buram: 1.8 }),
+  'kubus-6.svg': tekstur({ frekuensi: '0.004 0.006', oktaf: 5, benih: 96, gelap: TINTA_GELAP, terang: TINTA_TERANG, profil: 'asap', buram: 2.0 }),
 
   // Citra untuk pita hero dan kartu karya.
   'karya-1.svg': tekstur({ lebar: 700, tinggi: 900, frekuensi: '0.004 0.017', benih: 5, gelap: TINTA_GELAP, terang: TINTA_TERANG, profil: 'marmer', buram: 0.6 }),

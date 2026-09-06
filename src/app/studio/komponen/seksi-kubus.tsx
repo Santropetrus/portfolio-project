@@ -37,20 +37,36 @@ export function SeksiKubus() {
 
   const terapkan = useCallback((p: number) => {
     if (kubus.current) {
-      const putarX = -24 + p * 48;
+      /*
+       * Urutan fungsi transform menentukan arti setiap rotasi.
+       *
+       * CSS menerapkan fungsi dari kanan ke kiri pada titik, jadi yang paling
+       * kanan berputar di ruang lokal objek dan yang paling kiri di ruang
+       * layar. `rotateZ` diletakkan PALING LUAR supaya ia menjadi kemiringan
+       * bidang layar murni — memberi kesan miring seperti pada referensi
+       * tanpa mengubah sisi mana yang menghadap kamera.
+       *
+       * Ketika rotateZ berada di dalam, ia menggulingkan kubus pada sumbunya
+       * sendiri; digabung dengan putaran Y, arah "atas" kubus ikut berayun
+       * sampai sisi atas sesekali terlihat tepat dari samping dan menyusut
+       * jadi sliver setipis piksel yang terbaca sebagai tepi bergerigi.
+       *
+       * Sisanya membentuk turntable biasa: rotateX memiringkan pandangan ke
+       * bawah, rotateY memutar kubus pada sumbu tegaknya.
+       */
+      const putarZ = -20 + p * 14;
+      const putarX = -21 + p * 9;
       const putarY = -40 + p * 340;
-      // Rentang dijaga tetap negatif: kubus yang sejajar sumbu terbaca datar
-      // dan kaku, sedangkan sedikit miring membuatnya terbaca sebagai volume.
-      const putarZ = -21 + p * 15;
+
       // Membesar di tengah lintasan lalu mengecil lagi di kedua ujungnya.
       const skala = 0.78 + Math.sin(p * Math.PI) * 0.26;
       const naik = (0.5 - p) * 90;
 
       kubus.current.style.transform =
         `translate3d(0, ${naik.toFixed(2)}px, 0) ` +
+        `rotateZ(${putarZ.toFixed(2)}deg) ` +
         `rotateX(${putarX.toFixed(2)}deg) ` +
         `rotateY(${putarY.toFixed(2)}deg) ` +
-        `rotateZ(${putarZ.toFixed(2)}deg) ` +
         `scale(${skala.toFixed(4)})`;
     }
 
